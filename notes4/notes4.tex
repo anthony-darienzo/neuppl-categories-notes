@@ -1,29 +1,12 @@
-\documentclass{../thesis-note}
+\documentclass[../main.tex]{subfiles}
+
+\begin{document}
 
 \title{Presheaves and Indexed Set Theory}
 \author{NeuPPL Category Seminar}
 \date{Summer 2024}
 
-\definecolor{NortheasternRed}{RGB}{200,16,46}
-
-\titlecolor{NortheasternRed}
-
-\newcommand\Prop[1]{\text{{\normalfont{Prop}}}{\pwrap{{#1}}}}
-\newcommand\Dwd{\text{\normalfont Dwd}}
-\newcommand\natleq{\mathrel{\stackrel{\text{nat}}{\leq}}}
-\DeclareMathOperator\dset{\downarrow}
-\DeclareMathOperator\Mod{\normalfont Mod}
-\DeclareMathOperator\el{el}
-\newcommand\Pcal{{\mathcal{P}}}
-\newcommand\iSet[1]{{{#1}\text{\normalfont{-Set}}}}
-
-\tikzset{snake it/.style={decorate, decoration=snake}}
-
-\usepackage{bussproofs}
-
-\begin{document}
-
-\maketitle%
+\makehmtitle%
 
 The first half of these notes developed a categorical perspective on the theory
 of preorders. One key step in this theory is the observation that a preorder
@@ -362,9 +345,8 @@ Test
 
 \section{Presheaves: Indexed sets as functors}
 
-\newpage
-
-\bibliographystyle{apalike}
-\bibliography{../refs}
+\ifSubfilesClassLoaded{%
+    \bibliographystyle{apalike}%
+    \bibliography{../refs}}%
 
 \end{document}

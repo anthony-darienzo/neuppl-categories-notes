@@ -1,21 +1,12 @@
-\documentclass{../thesis-note}
-
-\title{Categorical Semantics and Categorical Logic}
-\author{NeuPPL Category Seminar}
-\date{28 June 2024}
-
-\definecolor{NortheasternRed}{RGB}{200,16,46}
-
-\titlecolor{NortheasternRed}
-
-\newcommand\Prop[1]{\text{{\normalfont{Prop}}}{\pwrap{{#1}}}}
-\DeclareMathOperator\Mod{\normalfont Mod}
-
-\usepackage{bussproofs}
+\documentclass[../main.tex]{subfiles}
 
 \begin{document}
 
-\maketitle%
+\title{Categorical Semantics and Categorical Logic}
+\author{NeuPPL Category Seminar}
+\date{Summer 2024}
+
+\makehmtitle%
 
 \section{Introduction: A Proposition for a Metatheory}
 
@@ -506,13 +497,6 @@ category of a theory is almost a copy of the theory. We will see later a
 construction, called the \emph{internal logic} of a category, which will recover
 the original theory from its classifying category.
 
-%\subsubsection*{Finer structure}
-
-\newpage
-\bibliographystyle{apalike}
-\bibliography{../refs}
-\newpage
-\appendix
 \section{The Lindenbaum Algebra}
 
 The Lindenbaum algebra is another algebraic model of a propositional theory. We
@@ -583,4 +567,13 @@ ourselves to provide our own equational theory. This will require more
 complicatd algebra, but it will build a system which is amenable to the
 Curry\-/Howard correspondence.
 
+\ifSubfilesClassLoaded{%
+    \bibliographystyle{apalike}%
+    \bibliography{../refs}}%
+
 \end{document}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:

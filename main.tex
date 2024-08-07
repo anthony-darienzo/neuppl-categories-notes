@@ -1,0 +1,108 @@
+\documentclass{./thesis-note}
+
+\usepackage{bussproofs}
+
+\definecolor{NortheasternRed}{RGB}{200,16,46}
+\titlecolor{NortheasternRed}
+
+\subtitle{Categorical Semantics of Programming Languages}
+\title{\color{NortheasternRed} NeuPPL Categories Seminar}
+\author{Anthony D'Arienzo}
+\date{Summer 2024}
+
+\providecommand\natsubseteq{{\stackrel{\text{nat}}{\leq}}}
+\newcommand\Prop[1]{\text{{\normalfont{Prop}}}{\pwrap{{#1}}}}
+\DeclareMathOperator\Mod{\normalfont Mod}
+
+\newcommand\Dwd{\text{\normalfont Dwd}}
+\newcommand\natleq{\mathrel{\stackrel{\text{nat}}{\leq}}}
+\DeclareMathOperator\dset{\downarrow}
+
+\newcommand\Pcal{{\mathcal{P}}}
+
+\DeclareMathOperator\el{el}
+\newcommand\iSet[1]{{{#1}\text{\normalfont{-Set}}}}
+
+\tikzset{snake it/.style={decorate, decoration=snake}}
+
+\usepackage{subfiles}
+
+\begin{document}
+
+\doublespacing%
+\vspace{\fill}
+\makehomeworktitle%
+\onehalfspacing%
+\vspace{0.1\paperheight}
+
+These notes are lecture notes from a summer seminar at
+Northeastern University to study category theory and its applications
+to the semantics of programming languages. The first half of these
+notes were written during the seminar, whereas the latter half was
+written after the last meeting. The contents of the latter half are,
+more or less, what was covered in these meetings.
+
+Our goal with this seminar was to develop the category theory
+necessary to understand the relationship between step\-/indexed
+logical relations and the Kripke\-/Joyal semantics of the topos of
+trees, i.e., the topos of presheaves over the first countable
+ordinal. The seminar concluded with an overview of Birkedal et al's
+article \emph{First Steps in Synthetic Guarded Domain Theory:
+  Step\-/Indexing in the Topos of Trees} \cite{5970227}.
+
+In between meetings, we read Fong and Spivak's \emph{An Invitation to
+  Applied Category Theory}\linebreak\cite{Fong2019}. As such, these
+notes assume that the reader has an idea for what is a category and a
+functor---though perhaps not familiar with category
+\emph{theory}!---approximately at the level of someone who has seen
+the Curry\-/Howard correspondence between certain categories and the
+simply typed \(\lambda\) calculus. On the other hand, these notes, and
+our seminar, were designed as a review and crash\-/course of the
+aspects of category theory needed to describe the Kripke\-/Joyal
+semantics of a topos. This aim motivates the order in which things are
+presented. First, the connection to propositional logic and preordered
+sets is established. We spend an extended time with preordered sets in
+order to develop the key results of category theory for this special
+case. We then introduce categories as an intensional/proof-relevant
+generalization of a preorder and presheaves as the corresponding
+generalization of a downward-closed set.
+
+This preorder\-/focused approach gives these notes a unique
+perspective on category theory. It is my hope that they emphasize the
+role of a topos as a context\-/aware universe of sets. These
+context\-/aware ``sets'' appear in the logical relations of virtually
+any programming language with more features than the simply\-/typed
+\(\lambda\) calculus, e.g., languages with recursive types or with
+references. These logical references can be complex: any quantifiers
+involved in their definition are guarded with conditions described
+their dependence on contextual data. In the case of recursive types,
+these extra conditions involve a \emph{step\-/index}. In the case of
+references, these conditions involve \emph{heap extensions}. In any
+case, these conditions are precisely those which appear from the
+Kripke\-/Joyal semantics. This gives the PL theorist a new tool: by
+working internal to a topos of contexts, one can replace the indexed
+logical relations and their extra conditions with the simpler
+relations used for the simply typed \(\lambda\) calculus.
+
+\vspace{\fill}
+
+\subtitle{}
+\title{}
+\author{}
+\date{}
+
+\subfileinclude{contents/contents}
+\subfileinclude{notes1/notes1}
+\subfileinclude{hw0/hw0}
+\subfileinclude{notes2/notes2}
+\subfileinclude{notes3/notes3}
+\subfileinclude{notes4/notes4}
+
+\bibliographystyle{apalike}
+\bibliography{./refs}
+
+\end{document}
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:

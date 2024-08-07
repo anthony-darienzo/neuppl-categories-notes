@@ -1,6 +1,6 @@
 \NeedsTeXFormat{LaTeX2e}
 % Originally based on my homework-math class.
-\ProvidesClass{thesis-note}[2024/8/7 Personal thesis note class, modified for NeuPPL]
+\ProvidesClass{thesis-note}
 
 %%% DEFAULTS %%%
 \def\@true{1}
@@ -308,6 +308,7 @@
   \ul{\mbox{#1}}%
   \egroup%
 }%
+\providecommand\tnTitleUnderline[1]{\@tnTitleUnderline{#1}}
 \newcommand*\@tnSectionNumberBox[1]{%
   \colorbox{\@titlecolor}
   {%
