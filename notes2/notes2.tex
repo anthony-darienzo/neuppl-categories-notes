@@ -1,0 +1,668 @@
+\documentclass{../thesis-note}
+
+\title{Category Theory on Preorders}
+\author{NeuPPL Category Seminar}
+\date{Summer 2024}
+
+\definecolor{NortheasternRed}{RGB}{200,16,46}
+
+\titlecolor{NortheasternRed}
+
+\newcommand\Prop[1]{\text{{\normalfont{Prop}}}{\pwrap{{#1}}}}
+\newcommand\Dwd{\text{\normalfont Dwd}}
+\newcommand\natleq{\mathrel{\stackrel{\text{nat}}{\leq}}}
+\DeclareMathOperator\dset{\downarrow}
+\DeclareMathOperator\Mod{\normalfont Mod}
+
+\usepackage{bussproofs}
+
+\begin{document}
+
+\maketitle%
+
+\section{Preorders are Indexed Propositions}
+
+Let \(\pwrap{X,\leq}\) be a preorder. Then we can form the classifying category
+\(\Cl\pwrap{X,\leq}\) as before. We also defined
+\(\Omega \eqdef \bwrap{ \True , \False }\). This is the preorder of
+\emph{propositions}. It is essentialy the preorder of booleans
+\texttt{bool}. However, for foundational reasons, it is useful to think of
+\(\Omega\) has having slightly less structure than the full boolean
+operations. In the first warmup, we constructed a functor
+\(\dset x : \Cl\pwrap{X,\leq}^\op \to \Omega\) by forming the
+\emph{downset}
+\[%
+  \dset x (y) \eqdef
+  \begin{cases}
+    \True & \text{if \(y \leq x\)}\\
+    \False & \text{otherwise.}
+  \end{cases}
+\]%
+The downset construction \(x \mapsto \dset x\) allows us to reason about
+the abstract preorder \(\pwrap{X,\leq}\) as if it were a collection of
+propositions, indexed by the elements of \(X\).
+\begin{definition}
+  Given a preorder \(\pwrap{X,\leq}\), a \textbf{downward closed set} is a
+  subset \(A \subseteq X\) satisfying the following closure property:
+  \[%
+    \begin{array}{c}
+      x \leq y \\\hline
+      y \in A \Rightarrow x \in A.
+    \end{array}
+  \]%
+\end{definition}
+There is another way to represent downward closed sets, in terms of functions
+\(X \to \Omega\). Given a subset \(A \subseteq X\), we can form the
+\emph{membership function} \(\chi_A : X \to \Omega\):
+\[%
+  \chi_A(x) \eqdef
+  \begin{cases}
+    \True & x \in A,\\
+    \False & \text{otherwise}.
+  \end{cases}
+\]%
+Conversely, any function \(\varphi: X \to \Omega\) defines a subset
+\(\varphi^{-1}(\True) \eqdef \bwrap{ x \in X \mid \varphi(x) = \True}\).
+\begin{proposition}
+  A subset \(A \subseteq X\) is downward closed if and only if its membership
+  function \(\chi_A : X \to \Omega\) is order\-/reversing. Similarly, a function
+  \(\varphi: X \to \Omega\) is order\-/reversing if and only if its
+  corresponding subset \(\varphi^{-1}\pwrap{\True}\) is downward closed.
+\end{proposition}
+\begin{proof}
+  Consider a subset \(A \subseteq X\). Suppose that \(A\) is downward closed,
+  i.e.,
+  \[%
+    \begin{array}{c}
+      x \leq y \\\hline
+      y \in A \Rightarrow x \in A.
+    \end{array}
+  \]%
+  Note \(y \in A\) if and only if \(\chi_A(y) = \True\). Therefore the above
+  judgment is equivalent to
+  \[%
+    \begin{array}{c}
+      x \leq y \\\hline
+      \chi_A(y) = \True \Rightarrow \chi_A(x) = \True.
+    \end{array}
+  \]%
+  This is the statement that \(\chi_A\) is order\-/reversing. Conversely, if
+  \(\chi_A\) is assumed to be order\-/reversing, then the equivalence of the
+  above two judgments implies \(A\) is downward closed.
+
+  The result for functions \(\varphi: X \to \Omega\) follows a similar
+  argument.
+\end{proof}
+The above proposition demonstrates a bijection between the following sets of
+structures
+\[%
+  \begin{array}{ccc}
+    \bwrap{ \text{Downward\-/closed subsets \(A \subseteq X\)} } &%
+    \cong &%
+    \bwrap{ \text{Order\-/reversing functions \(X \to \Omega\)} }\\
+    A & \mapsto & \chi_A \\
+    \varphi^{-1}\pwrap\True & \mapsfrom & \varphi
+  \end{array}
+\]%
+Recall that an order\-/preserving function \(\pwrap{X,\leq} \to \pwrap{Y,\leq}\)
+is equialent to the data of a functor between classifying categories
+\(\Cl\pwrap{X,\leq} \to \Cl\pwrap{Y,\leq}\). Furthermore, an order\-/reversing
+function \(\pwrap{X,\leq} \to \pwrap{Y,\leq}\) is the same data as an
+order\-/\emph{preserving} function---provided the preorder on \(X\) is replaced
+with the reverse preorder \(\geq\). In other words, we have a chain of
+bijections
+\begin{align*}%
+  \bwrap{ \text{Order\-/reversing functions
+      \(\pwrap{X,\leq} \to \pwrap{\Omega,\leq}\)} } &\cong \bwrap{
+    \text{Order\-/preserving functions \(\pwrap{X,\geq} \to
+      \pwrap{\Omega,\leq}\)} }\\
+  &\cong \bwrap{ \text{Functors \(\Cl\pwrap{X,\leq}^\op \to \Omega\)} }.
+\end{align*}%
+Combining this with the preceding proposition on downward closed sets, we have
+obtained the following theorem.
+\begin{theorem}[Grothendieck construction for preorders]
+  There is a bijective correspondence
+  \[%
+    \bwrap{\text{Downward-closed subsets \(A \subseteq X\)}} \cong
+    \bwrap{\text{Functors \(\Cl\pwrap{X,\leq}^\op \to \Omega\)}}
+  \]%
+  given by sending a downward closed subset \(A\) to the functor associated to
+  \(\chi_A\) and by sending a functor \(F : \Cl\pwrap{X,\leq}^\op \to \Omega\)
+  to the set of objects \(x \in X\) such that \(F(x) = \True\).
+\end{theorem}
+\begin{warning_box}{Remark}
+  The above theorem allows us to make our first abuse of notation! In these
+  notes we will now identify the functor \(\dset x : \Cl\pwrap{X,\leq}^\op \to
+  \Omega\) with its associated downward closed set
+  \[%
+    \bwrap{ y \in X \mid \dset x(y) = \True }.
+  \]%
+  In retrospect, it would have been better to work entirely with
+  downward\-/closed sets first, and introducing functors later. In the sequel,
+  where we repeat the above with presheaves, it will be cleaner to avoid this
+  abuse of notation.
+\end{warning_box}
+Downward closed sets inherit a partial order given by inclusion of subsets. This
+allows us to talk about the \textbf{partial order of downward closed sets}
+\[%
+  \pwrap{\Dwd(X), \subseteq}.
+\]%
+The downset construction \(x \mapsto \dset x\) is an embedding \(X \to
+\Dwd(X)\) with some nice properties.
+\begin{lemma}[Yoneda lemma for preorders]
+  The operation \(\dset : X \to \Dwd(X)\) is fully faithful, i.e.,
+  \(x \leq y\) if and only if \(\dset x \subseteq \dset y\). In
+  particular, \(\dset x = \dset y\) if and only if \(x \leq y\) and
+  \(y \leq x\). Furthermore, for any downward closed set \(A \in \Dwd(X)\),
+  \[%
+    x \in A \text{ if and only if } \dset x \subseteq A.
+  \]%
+\end{lemma}
+\begin{proof}
+  The first part, that \(\dset\) is fully faithful, was Exercise 3 of the
+  warmup. The second part, that \(x \in A\) if and only if \(\dset x \subseteq
+  A\) follows a similar proof.
+
+  Assume \(x \in A\). The downset associated to \(\dset x\) is the collection of
+  all elements \(y \in X\) such that \(y \leq x\). Thus,
+  \begin{prooftree}
+    \AxiomC{$x \in A$}
+    \AxiomC{$y \in \dset x$}
+    \RightLabel{Defn. $\dset x$}
+    \UnaryInfC{$y \leq x$}
+    \RightLabel{$A \in \Dwd(X)$}
+    \BinaryInfC{$y \in A$.}
+  \end{prooftree}
+  Since \(y\) is arbitrary, this shows \(\dset x \subseteq A\), as
+  desired. Conversely, assume \(\dset x \subseteq A\). By reflexivity, \(x \leq
+  x\), so \(x \in \dset x\). In particular, \(x \in A\), as desired.
+\end{proof}
+\begin{remark}
+  Exercise 3 and the above lemma are proven using the same technique. The
+  judgment \(\dset x \subseteq A\) relates arrows \(y \to x\) to elements of
+  \(A\). Among all arrows \(y \to x\), there is a unique ``universal'' choice,
+  namely the identity \(\id_x: x \to x\) (universal in the sense that it always
+  exists). In similar situations, where one is quantifying over arrows in a
+  category, picking the identity is often a decisive trick.
+\end{remark}
+The Grothendieck construction for preorders and the Yoneda lemma allow us to
+study a preorder \(\pwrap{X,\leq}\) through its downward closed sets
+\(\pwrap{\Dwd(X),\subseteq}\). In this sense, the only preorder relation is the
+subset inclusion relation \(\subseteq\): all others are abstracted
+``substructures'' of a preorder of subsets, if we pay the price of treating
+a pair of elements \(x,y \in X\) as ``equivalent'' if \(x \leq y\) and \(y \leq
+x\). This price is often worth paying, since \(\Dwd(X)\) has more structure than
+\(X\).
+\begin{observation}
+  \(\Dwd(X)\) is a complete Heyting algebra.
+\end{observation}
+Since \(\Dwd(X)\) is a complete Heyting algebra, we can freely take unions and
+intersections of downward-closed sets. This will be the basis of the following
+section.
+
+\section{Limits and Colimits of Preorders}
+
+In the previous section, we saw that we can study a preorder \(\pwrap{X,\leq}\)
+using its collection of downward closed sets \(\Dwd(X)\). This was justified by
+the embedding \(\dset : X \to \Dwd(X)\). Furthermore, \(\Dwd(X)\) is a complete
+Heyting algebra. We can use this Heyting algebra structure to define operations
+in \(X\). For example, we can form intersections.
+\begin{definition}
+  Let \(x,y \in X\) be a pair of elements. A \textbf{conjunction} of \(x,y\) is
+  an element \(z \in X\) which satisfies the equation of downward-closed
+  subsets.
+  \[%
+    \dset z = \dset x \cap \dset y.
+  \]%
+\end{definition}
+In other words, a conjunction in \(X\) of \(x\) and \(y\) is an element which
+behaves like the intersection of \(x\) and \(y\). Since the embedding \(\dset :
+X \to \Dwd(X)\) is fully faithful, this can be formalized in the manner
+above. Another way to describe a conjunction is via a \emph{universal
+  property}.
+\begin{proposition}\label{prop:conjunction}
+  Let \(x,y \in X\) be a pair of elements. An element \(z \in X\) is a
+  conjunction of \(x\) and \(y\) if and only if, for any element \(w \in X\),
+  \[%
+    w \leq z \text{ if and only if } w \leq x \text{ and } w \leq y.
+  \]%
+\end{proposition}
+In category theory, we usual write universal properties like the one in the
+above proposition as a diagram. In this case, the diagram depicts arrows in the
+classifying category \(\Cl\pwrap{X,\leq}\). Here is the diagram for a binary
+conjunction.
+\[%
+  \begin{tikzcd}
+    w \arrow[dr,dashed,"\exists !"] \arrow[drr,bend left=30] \arrow[ddr,bend
+    right=30] & & \\
+    & z \arrow[r] \arrow[d] & x \\
+    & y &
+  \end{tikzcd}
+\]%
+Every arrow in this diagram, being an arrow in \(\Cl\pwrap{X,\leq}\) represents
+a comparison using \(\leq\). The solid arrows represent the hypotheses of the
+universal property, and the dashed line represents the conclusion. In this case,
+the diagram translates to
+\begin{indented}
+  \centering
+  \emph{Given \(z \leq x\) and \(z \leq y\). If \(w \leq x\) and \(w \leq y\),
+    then \(w \leq z\).}
+\end{indented}
+I have also added the symbol \(\exists !\) to the diagram. This is not relevant
+for preorders, because there is always at most one arrow between any two objects
+of \(\Cl\pwrap{X,\leq}\). However, in general category theory, universal
+properties almost always require the dashed line to be unique.
+\begin{proof}[Proof of Proposition~\ref{prop:conjunction}]
+  Assume \(z\) is a conjunction of \(x\) and \(y\). We need to show, for any
+  element \(w \in X\), \(w \leq z\) if and only if \(w \leq x\) and \(w \leq
+  y\). We now chase a chain of iffs
+  \begin{align*}
+    w \leq z &\text{ iff } w \in \dset z\\
+    &\text{ iff } w \in \dset x \cap \dset y\\
+    &\text{ iff } w \in \dset x \text{ and } w \in \dset y\\
+    &\text{ iff } w \leq x \text{ and } w \leq y.
+  \end{align*}
+  Here the second iff holds because \(z\) is a conjunction of \(x\) and
+  \(y\). The converse direction is a similar argument.
+\end{proof}
+\begin{remark}
+  In the above, \(z\) is called \emph{a} conjunction of \(x\) and \(y\) rather
+  than \emph{the} conjunction of \(x\) and \(y\). This is because conjunctions
+  are technically not unique---but they are unique \emph{up to
+    isomorphism}. Suppose \(z\) is a conjunction of \(x\) and \(y\), and suppose
+  that there exists an element \(z' \in X\) such that \(z' \leq z\) and
+  \(z \leq z'\). (These conditions are equivalent to the statement that \(z\)
+  and \(z'\) are isomorphic in \(\Cl\pwrap{X,\leq}\).) Then \(\dset z' = \dset
+  z\), so \(z'\) is also a conjunction of \(x\) and \(y\). In practice,
+  identifying isomorphic objects is manageable, so we usually give the
+  isomorphism class of conjunctions of \(x\) and \(y\) a name
+  \[%
+    z \cong x \wedge y.
+  \]%
+  Furthermore, it is common in category theory to write \(x \wedge y\) instead
+  of a explicit representative of the conjunction.
+\end{remark}
+We now consider two examples.
+\begin{example}[A preorder of subsets]
+  Suppose \(\pwrap{X,\leq}\) is a preorder of subsets \(\pwrap{X,\leq} =
+  \pwrap{\mathcal{P}(V),\subseteq}\). Consider a pair of subsets \(A, B \in
+  \mathcal{P}(V)\). A conjunction \(A \wedge B\) of \(A\) and \(B\) satisfies
+  the universal property:
+  \[%
+    \forall W \subseteq V, W \subseteq A \wedge B \Leftrightarrow W \subseteq A
+    \text{ and } W \subseteq B.
+  \]%
+  If we pick singleton subsets \(\bwrap{v}\) for \(W\) (so \(v\) is some element
+  of \(V\)), then the above universal property implies
+  \[%
+    \forall v \in V, v \in A \wedge B \Leftrightarrow v \in A \text{ and } v \in
+    B.
+  \]%
+  This sentence uniquely characterizes the intersection \(A \cap B\). Therefore
+  \[%
+    A \wedge B \cong A \cap B.
+  \]%
+  (Furthermore, since \(\subseteq\) is an antisymmetric relation, this
+  immediately implies \(A \wedge B = A \cap B\).) Power sets are the nicest type
+  of preorder: they have a generating set of singleton sets, also called
+  \emph{atoms}, which can distinguish any pair of objects in the power set. This
+  property is called \emph{well\-/pointedness}. For this reason, we could be
+  silly and say that a power set \(\mathcal{P}(V)\) is an example of a
+  \emph{atomic 0\-/topos with enough points}. This probably doesn't help to
+  understand preorders, but it can be useful to intuit how an atomic topos
+  generalizes the power-set situation!
+\end{example}
+\begin{example}[A propositional theory]
+  Let \(T = \pwrap{\Sigma,\Delta}\) be a propositional theory. We constructed
+  the classifying category of \(T\), \(\Cl(T)\), whose objects are propositions
+  \(\phi\) in \(T\) and whose arrows \(\phi \to \psi\) correspond to sequents
+  \(\phi \vdash_T \psi\). Given two propositions \(\phi\) and \(\psi\) of \(T\),
+  we can ask for their conjunction. This conjunction is a proposition, \(P\)
+  such that, for any other proposition \(Q\),
+  \[%
+    Q \vdash_T P \Leftrightarrow Q \vdash_T \phi \text{ and } Q \vdash_T \psi.
+  \]%
+  The latter condition, \(Q \vdash_T \phi\) and \(Q \vdash_T \psi\) is
+  equivalent to \(Q \vdash_T \phi \wedge \psi\). Thus, a conjunction \(P\)
+  satisfies
+  \[%
+    Q \vdash_T P \Leftrightarrow Q \vdash_T \phi \wedge \psi.
+  \]%
+  This implies \(P \vdash_T \phi \wedge \psi\) and \(\phi \wedge \psi \vdash_T
+  P\). Thus \(P \cong \phi \wedge \psi\). In other words, the conjunctions in
+  \(\Cl\pwrap{T}\) are provably equivalent to the usual conjunctions from
+  propositional logic. This observation justifies our use of the symbol
+  \(\wedge\) to denote conjunction. It also an example of the motivation of
+  categorical logic: \emph{features in a language correspond to universal
+    properties of the classifying category}.
+\end{example}
+We defined conjunctions by an equation of downsets. Nothing is stopping us from
+picking other equations in order to study other universal properties. For
+example, we could ask for larger conjunctions. Given a family \(x_\alpha\) of
+elements of \(X\), a conjunction \(\bigwedge_\alpha x_\alpha\) is an element \(z
+\in X\) satisfying the equation
+\[%
+  \dset z = \bigcap_\alpha \dset x_\alpha.
+\]%
+From this we can derive the universal property like before. Instead we move
+ahead to the general picture.
+\begin{definition}
+  Let \(\pwrap{X,\leq}\) be a preordered set. A \textbf{diagram} is an
+  order\-/preserving map \(J : \pwrap{D,\leq} \to \pwrap{X,\leq}\). In other
+  words, a diagram is a functor \(J : \Cl\pwrap{D,\leq} \to
+  \Cl\pwrap{X,\leq}\).
+\end{definition}
+To every diagram \(J : \pwrap{D,\leq} \to \pwrap{X,\leq}\), we can create a
+downward closed set \(\dset J\) in \(\Dwd(X)\):
+\[%
+  \dset J \eqdef \bigcap_{i \in D} \dset \pwrap{J(i)}.
+\]%
+Thus, \(x \in \dset J\) if and only if \(x \leq J(i)\) for every \(i \in D\).
+\begin{definition}
+  Given a diagram \(J : \pwrap{D,\leq} \to \pwrap{X,\leq}\), a \textbf{limit} of
+  \(J\) is an element \(z \in X\) such that
+  \[%
+    \dset z = \dset J
+  \]%
+  as elements of \(\Dwd(X)\). Similar to how conjunctions were written using
+  \(\wedge\), e.g., ``\(x \wedge y\)'', we write for limits
+  \[%
+    z \cong \varprojlim_{i \in D} J(i) \text{ or } \cong \varprojlim J.
+  \]%
+\end{definition}
+There are two equivalent ways to describe limits in a preorder. First, we can
+describe a limit by its membership function
+\begin{observation}\label{obs:limit-pointwise}
+  Given a diagram \(J : \pwrap{D,\leq} \to \pwrap{X,\leq}\) and an element \(z
+  \in X\), \(z\) is a limit for \(J\) if and only if, for any element \(x \in
+  X\),
+  \[%
+    \dset z(x) = \bigwedge_{i \in D} \dset J(i) (x).
+  \]%
+\end{observation}
+\begin{proposition}
+  In a preorder \(\pwrap{X,\leq}\), limits are infima. Formally, given a diagram
+  \(J : \pwrap{D,\leq} \to \pwrap{X,\leq}\),
+  \[%
+    \varprojlim J \cong \inf \bwrap{ J(i) \in X \mid i \in D }.
+  \]%
+\end{proposition}
+\begin{proof}
+  The universal property of the infimum on the right is: for any element \(x \in
+  X\),
+  \[%
+    x \leq \inf \bwrap{ J(i) \in X \mid i \in D } \text{ iff } \bigwedge_{i \in
+      D} x \leq J(i).
+  \]%
+  By the preceding observation this is the same universal property as the limit
+  \(\varprojlim J\).
+\end{proof}
+\begin{warning_box*}
+  The reason that limits are the same as infima for preorders is because the
+  classifying category \(\Cl\pwrap{X,\leq}\) of a preorder is \emph{thin}. That
+  is, between any two objects \(x,y\) of \(\Cl\pwrap{X,\leq}\), there is at most
+  one arrow \(x \to y\). More generally, we need to impose certain commutativity
+  conditions which we will explore later.
+\end{warning_box*}
+There is one special diagram to explore. The empty set \(\emptyset\) has a
+(unique) structure of a preordered set. Therefore, we may consider the empty map
+\(J_\emptyset : \emptyset \to \pwrap{X,\leq}\) as a diagram, vacuously. We can
+ask if \(X\) has any limits for this diagram. A limit for \(J_\emptyset\) is an
+element \(z \in X\) such that
+\[%
+  \dset z = \bigcap_{\_ \in \emptyset} \dset J(\_) = X,
+\]%
+since empty intersections yield the entire preorder. This can also be seen by
+comparing membership functions: \(x \in \dset z\) if and only if, for any \(\_\)
+in \(\emptyset\), \(x \in \dset J(\_)\). Since the latter condition is always
+vacuously satisfied, \(x \in \dset z\) is always satisfied, so \(\dset z = X\).
+\begin{definition}
+  A \textbf{terminal object} is a limit of the empty diagram. For a preorder
+  \(X\), a terminal object is the same as a maximum for \(X\).
+\end{definition}
+
+\subsection*{The reverse situation}
+
+We have related limits to infima. We now describe the category theory for
+suprema. These are called \emph{colimits}. Their definition is more
+indirect---at least from the downset perspective. We turn to
+Observation~\ref{obs:limit-pointwise}, which describes the downset of a limit as
+a large conjunction. We can swap the role of \(z\) and \(x\) on the right
+side of that equation. This yields a colimit.
+\begin{definition}\label{def:colimit}
+  Let \(J : \pwrap{D,\leq} \to \pwrap{X,\leq}\) be a diagram. A \textbf{colimit}
+  of \(J\) is an object \(z \in X\) such that, for any element \(x \in X\),
+  \[%
+    \dset x(z) = \bigwedge_{i \in D} \dset J(i) (x).
+  \]%
+  We write a colimit using similar notation as the limit:
+  \[%
+    z \cong \varinjlim_{i \in D} J(i) \cong \varinjlim J.
+  \]%
+\end{definition}
+\begin{warning_box*}
+  For emphasis, below is the equation characterizing a limit of the diagram
+  \(J\), where the difference to the colimit equation highlighted.
+  \[%
+    \dset{\color{red}z}({\color{red}x}) = \bigwedge_{i \in D} \dset J(i) (x).
+  \]%
+\end{warning_box*}
+\begin{proposition}
+  Given a diagram \(J : \pwrap{D,\leq} \to \pwrap{X,\leq}\), \(z\) is a colimit
+  for \(J\) if and only if, for any \(x \in X\),
+  \[%
+    z \leq x \text{ iff } \forall i \in D, J(i) \leq x.
+  \]%
+  In other words, \(z \cong \sup \bwrap{ J(i) \mid i \in D }\), or in terms of
+  downsets
+  \[%
+    \dset z = \bigvee_{i \in D} \dset J(i).
+  \]%
+\end{proposition}
+Similar to the conjunctions from earlier, we can form disjunctions using a
+colimit.
+\begin{definition}
+  Let \(\pwrap{X,\leq}\) be a preorded set, and let \(x,y\) be a pair of
+  elements of \(X\). Let \(\bwrap{a,b}\) denote the preordered set with no
+  relation imposed on \(a\) and \(b\). The function
+  \(J : \pwrap{a,b} \to \pwrap{X,\leq}\) sending \(a\) to \(x\) and \(b\) to
+  \(y\) is order\-/preserving, so it is a diagram. A \textbf{disjunction} for
+  \(x\) and \(y\) is a colimit for this diagram. That is, an element \(x \vee
+  y\) is a disjunction for \(x\) and \(y\) if and only if, for any element \(v
+  \in X\),
+  \[%
+    x \vee y \leq v \text{ iff } x \leq v \text{ and } y \leq v.
+  \]%
+\end{definition}
+A disjunction's universal property can be expressed diagramtically, like for
+conjunctions (or any limit or colimit, for that matter). Here is the diagram for
+the disjunction of \(x\) and \(y\).
+\[%
+  \begin{tikzcd}
+    & x \arrow[d] \arrow[ddr,bend left=30] & \\
+    y \arrow[r] \arrow[drr,bend right=30] & x \vee y \arrow[dr,dashed,"\exists
+    !"] & \\
+    & & v
+  \end{tikzcd}
+\]%
+From the diagram we can see an important relationship between limits and
+colimits. If we replace the order \(\leq\) on \(X\) with its reverse \(\geq\),
+then the ensuing classifying category \(\Cl\pwrap{X,\geq}\) is the opposite
+category of \(\Cl\pwrap{X,\leq}\), also called \(\Cl\pwrap{X,\leq}^\op\). All
+the arrows in this category have flipped direction. If we flip the arrows in the
+above diagram, we get the same picture for a conjunction, just rotated \(180\)
+degrees (which does not change the universal property!). In other words:
+\begin{observation}
+  A disjunction in \(\pwrap{X,\leq}\) is the same as a conjunction in
+  \(\pwrap{X,\geq}\).
+\end{observation}
+More generally, a colimit of \(\Cl\pwrap{X,\leq}\) is the same as a limit of
+\(\Cl\pwrap{X,\leq}^\op\). This arrow\-/reversing relationship is the reason
+\(x\) and \(z\) are swapped in Definition~\ref{def:colimit}.
+
+We wrap things up by describing the colimit analogue of a terminal object.
+\begin{definition}
+  Let \(\pwrap{X,\leq}\) be a preordered set. An \textbf{initial object} of
+  \(X\) is a colimit for the empty diagram \(J_\emptyset : \emptyset \to
+  \pwrap{X,\leq}\).
+\end{definition}
+Equivalently, an initial object is an element \(z \in X\) such that, for any
+\(x \in X\),
+\[%
+  z \leq x \text{ iff } \forall \_ \in \emptyset, J_\emptyset(\_) \leq x.
+\]%
+The latter condition is always true, vacuously. Therefore, \(z \leq x\) for
+every \(x \in X\), so an initial object of a preorder is the same as a minimum.
+\subsection*{Indexed propositions}
+
+The key takeaway from these constructions of limits and colimits is that they
+are described by operations on the downsets of elements of
+\(\pwrap{X,\leq}\). While \(X\) may not be a Heyting algebra, we can inherit the
+language of Heyting algebras by working in \(\Dwd(X)\): the downset of a limit
+is an intersection of downsets, and the downset of a colimit is a union of
+downsets.
+
+We may take an alternative but equivalent approach. Recall (from the
+Grothendieck construction for preorders) that a downward closed set is the same
+as a functor \(\Cl\pwrap{X,\leq}^\op \to \Omega\), where \(\Omega\) is the
+preorder of truth values. Under this correspondence, intersection of downward
+closed sets is identified with the operation
+\[%
+  \texttt{and} : \Omega \times \Omega \to \Omega,
+\]%
+and union of downward closed sets is identified with the dual
+\[%
+  \texttt{or} : \Omega \times \Omega \to \Omega.
+\]%
+For example, for any \(v \in X\)
+\[% 
+  \dset \pwrap{x \wedge y}(v) = \dset x (v) \,\texttt{and}\, \dset y (v).
+\]%
+Indeed, for any operation on propositions \(\Omega \times \ldots \times \Omega
+\to \Omega\), we can create a universal property on downsets/indexed
+propositions to explore in a preorder.
+\begin{definition}
+  Given an operation \(\delta : \Omega^n \to \Omega\),
+  this operation is \textbf{representable} in a preorder \(\pwrap{X,\leq}\) if,
+  for any family of objects \(x_1,\ldots,x_n\), there exists an object \(z \in
+  X\) such that for any \(v \in X\)
+  \[%
+    \dset z (v) = \delta\pwrap{\dset x_1(v),\ldots,\dset x_n(v)}.
+  \]%
+  Dually, \(\delta\) is \textbf{co\-/representable} in \(\pwrap{X,\leq}\) if it
+  is representable in \(\pwrap{X,\geq}\). Equivalently, \(\delta\) is
+  corepresentable if, for any family of objects \(x_1,\ldots,x_n\), there exists
+  an object \(z \in X\) such that for any \(v \in X\)
+  \[%
+    \dset v (z) = \delta\pwrap{\dset x_1(v),\ldots,\dset x_n(v)}.
+  \]%
+\end{definition}
+In this sense, a preorder has conjunctions if \(\texttt{and}\) is
+representable. This notion of representability will later allow us to describe
+the relation between a topos and a universe of sets. In this sense, a topos will
+be a category where many of the operations from set theory are either
+representable or co\-/representable.
+
+\section{Yoneda and Generalized Objects}
+
+Given a preorder \(\pwrap{X,\leq}\) the elements \(x \in X\) are subsumed by
+their downsets \(\dset x \in \Dwd(X)\). We saw this in the Yoneda lemma, where
+the preorder \(\leq\) on \(X\) is modeled by the subset inclusion \(\subseteq\)
+on \(\Dwd(X)\). We also saw this in the previous section, where universal
+properties, such as infima and suprema, can be described in terms of unions and
+intersections of downward closed sets. Regarding the other downward-closed sets
+\(A \in \Dwd(X)\), since they are downward-closed, they behave like elements in
+\(X\), as far as the preordering relation is concerned. For this reason,
+downward-closed sets (like their categorified cousins, presheaves) are
+\emph{generalized objects} of \(X\). One way to witness this is through the
+\emph{co-Yoneda lemma}.
+\begin{lemma}[Co-Yoneda Lemma for preorders]
+  Let \(A \in \Dwd(X)\) be a downward closed set. The membership function
+  \(\chi_A : \Cl\pwrap{X,\leq}^\op \to \Omega\) satisfies the equation
+  \[%
+    \chi_A(y) = \bigvee_{x \in X} \pwrap{\chi_A(x) \wedge \dset x(y)} =
+    \bigvee_{x \in A} \dset x(y).
+  \]%
+\end{lemma}
+The co-Yoneda lemmma shows that any downward-closed set \(A \in \Dwd(X)\) is a
+union of sets of the form \(\dset x\), for objects \(x \in X\). These equations
+come from the co-Yoneda lemma for presheaves.
+\[%
+  \begin{array}{ccc}
+    \bigvee_{x \in X} \pwrap{\chi_A(x) \wedge \dset x}%
+    & \text{ is a special case of }%
+    & \int^{x : X} \chi_A(x) \cdot \Yo(x).\\
+    \bigvee_{x \in A} \dset x%
+    & \text{ is a special case of }%
+    & \varinjlim\pwrap{\text{el}(A) \to X \xrightarrow{\Yo} \text{Psh}(X)}.
+  \end{array}
+\]%
+We will present two proofs. The first is a direct proof. The second follows the
+structure of the proof of the general Co-Yoneda lemma. Before the proofs, we
+discuss how the co-Yoneda lemma allows us to treat downward closed sets like
+generalized objects.
+
+\begin{proof}[First proof]
+  Let \(y\) be an arbitrary element of \(X\). If \(\chi_A(y) = \True\), then
+  \(\chi_A(y) \wedge \dset y (y)\) is also \(\True\). Therefore the right side
+  of the equation is \(\True\). Conversely, suppose
+  \(\bigvee_{x \in X} \pwrap{\chi_A(x) \wedge \dset x(y)} = \True\). Then there
+  exists some \(x_0 \in X\) such that
+  \(\chi_A(x_0) \wedge \dset x_0 (y) = \True\). In particular, \(x_0 \in A\) and
+  \(y \leq x_0\). Since \(A\) is downward closed, this implies \(y \in A\), so
+  \(\chi_A(y) = \True\). Thus, the left side of the equation evaluates to
+  \(\True\) if and only if the right side of the equation evaluates to
+  \(\True\), as desired.
+\end{proof}
+\begin{proof}[Second proof]
+  We begin by making a few observations. First, we can impose a preorder on
+  order\-/reversing functions \(f,g : \pwrap{X,\leq} \to \Omega\) by defining
+  \[%
+    f \leq g \text{ if and only if } \forall x \in X. f(x) \leq g(x).
+  \]%
+  Secondly, given two order\-/reversing functions
+  \(f_1,f_2 : \pwrap{X,\leq} \to \Omega\), \(f_1 = f_2\) if and only if, for any
+  other order\-/reversing function \(g: \pwrap{X,\leq} \to \Omega\), \(f_1 \leq
+  g\) if and only if \(f_2 \leq g\).\footnote{%
+    The second observation is the Yoneda lemma. We can use the same trick,
+    supplying \(f_1\) and \(f_2\) for \(g\), to prove it. Indeed, one could simply
+    invoke the Yoneda lemma for preorders, because the class of order\-/preserving
+    functions between two preordered sets is a set. When generalizing to presheaves,
+    this is no longer the case, so one encounters the usual set-theoretic obstacles.
+  }%
+  Furthermore, given two order\-/reversing functions \(f,g : \pwrap{X,\leq} \to
+  \Omega\), we may define a new function \(f \Rightarrow g : \pwrap{X,\leq} \to
+  \Omega\) using the usual implication
+  \[%
+    \pwrap{f\Rightarrow g}(x \in X) \eqdef f(x) \Rightarrow g(x) =
+    \begin{cases}
+      \True & f(x) \leq g(x) \\
+      \False & \text{otherwise}.
+    \end{cases}
+  \]%
+  Lastly, we can combine the Yoneda lemma for preorders and the last observation
+  to deduce \(\pwrap{\dset x \Rightarrow g}(y) = g(x)\) for any input
+  \(y \in X\). Based on these observations, in order to prove the desired
+  equation
+  \[%
+    \chi_A(y) = \bigvee_{x \in X} \pwrap{\chi_A(x) \wedge \dset x(y)},
+  \]%
+  it suffices to prove the following. For any order\-/reversing \(g: X \to
+  \Omega\),
+  \[%
+    \chi_A \leq g \text{ if and only if } \bigvee_{x \in X} \pwrap{\chi_A(x)
+      \wedge \dset x} \leq g.
+  \]%
+  We can now chase a chain of implications
+  \begin{align*}
+    & \bigvee_{x \in X} \pwrap{\chi_A(x) \wedge \dset x} \leq g \\
+    \text{iff} & \bigwedge_{x \in X} \pwrap{ \pwrap{\chi_A(x) \wedge \dset x}
+      \leq g }\\
+    \text{iff} & \bigwedge_{x \in X} \pwrap{\chi_A(x) \leq \dset x \Rightarrow
+      g}\\
+    \text{iff} & \bigwedge_{x \in X} \pwrap{\chi_A(x) \leq g(x)}\\
+    \text{iff} & \,\chi_A \leq g.
+  \end{align*}
+\end{proof}
+
+\end{document}

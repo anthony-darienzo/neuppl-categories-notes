@@ -1,0 +1,370 @@
+\documentclass{../thesis-note}
+
+\title{Presheaves and Indexed Set Theory}
+\author{NeuPPL Category Seminar}
+\date{Summer 2024}
+
+\definecolor{NortheasternRed}{RGB}{200,16,46}
+
+\titlecolor{NortheasternRed}
+
+\newcommand\Prop[1]{\text{{\normalfont{Prop}}}{\pwrap{{#1}}}}
+\newcommand\Dwd{\text{\normalfont Dwd}}
+\newcommand\natleq{\mathrel{\stackrel{\text{nat}}{\leq}}}
+\DeclareMathOperator\dset{\downarrow}
+\DeclareMathOperator\Mod{\normalfont Mod}
+\DeclareMathOperator\el{el}
+\newcommand\Pcal{{\mathcal{P}}}
+\newcommand\iSet[1]{{{#1}\text{\normalfont{-Set}}}}
+
+\tikzset{snake it/.style={decorate, decoration=snake}}
+
+\usepackage{bussproofs}
+
+\begin{document}
+
+\maketitle%
+
+The first half of these notes developed a categorical perspective on the theory
+of preorders. One key step in this theory is the observation that a preorder
+\(\pwrap{X,\leq}\) may be treated as a family of indexed propositions
+\(\Cl\pwrap{X,\leq}^\op \to \Omega\). This allowed us to lift operations on
+truth values \(\Omega\) to universal constructions in a preorder. In a category
+\(C\), we can no longer treat objects like indexed \emph{propositions}, but
+there is a way to generalize this philosophy. Instead, we need to study indexed
+sets, i.e., \emph{presheaves}. Similar to the preorder situation, operations
+between sets can be lifted to universal constructions in a category.
+
+\section{A brief account of categories}
+
+A category is a collection of objects and arrows between them which can be
+composed. There are myriad situations where such structure arises. Perhaps two
+archetypes are interfaces and theories. Qua interface, a category is a
+collection of states, called \emph{objects}, and families of transitions between
+states, called \emph{arrows}. Functors \(F : C \to \Set\) can be seen as
+concrete implementations of this interface. This philosophy is explained well
+in~\cite{Fong2019}. This approach also forms the semantics for algebraic
+effects. For example, algebras of the \texttt{Writer m} monad, for some monoid
+\texttt{m} are described by the category
+\begin{figure}[h]
+  \centering
+  \begin{tikzpicture}[node distance=1.75cm]
+    \tikzstyle{place}=[circle,thick,draw=gray!75,fill=gray!20,minimum size=6mm]
+    \begin{scope}
+      \node [place] (obj) {};
+      \draw[thick,->, shorten >=1pt] (obj) to [out=90,in=135,loop,looseness=4.8]
+      (obj);
+      \draw[thick,->, shorten >=1pt] (obj) to [out=155,in=200,loop,looseness=4.8]
+      (obj);
+      \draw[thick,->, shorten >=1pt] (obj) to [out=220,in=265,loop,looseness=4.8]
+      (obj);
+      \node[rotate=45] (dots) at ($ (obj) + (-30:0.5) $) {$\cdots$};
+      \draw[thick,->, shorten >=1pt] (obj) to
+      [out=375,in=420,loop,looseness=4.8] (obj);
+    \end{scope}
+  \end{tikzpicture}
+\end{figure}
+consisting of a single object and an arrow for every element of the monoid
+\texttt{m}. Functors from this category to, e.g., \(\Set\) identifies a set
+\(X\) (the image of the single object) and a family of functions \(X \to X\) for
+every element of \texttt{m}. This is a \texttt{Writer m} algebra.
+
+Qua theory, a category \(C\) is the classifying category of
+\emph{some theory}. Functors out of this category are the same as models of this
+theory. Given a propositional theory \(T\), we saw that functors from \(\Cl(T)\)
+to a preorder \(X\) were the same as models of \(T\) in \(X\). This perspective
+is not fundamentally different to the interface perspective.
+
+We will be using categories to describe the logical relations of a programming
+language with state, e.g., name allocation or step\-/indexing. We will identify
+a category \(C\) whose objects will represent states of a heap. Arrows of \(C\)
+will identify how a heap state may be extended with fresh names. We will write
+our logical relations as sets indexed by heap states, i.e., functors out of
+\(C\) into \(\Set\).
+
+For the sake of completeness, here is a definition of a (small) category.
+\begin{definition}
+  A \textbf{small category} \(C\) is a pair of sets \(\pwrap{C^{(0)},
+    C^{(1)}}\), called its set of \textbf{objects} and its set of
+  \textbf{arrows}, respectively, and a family of functions.
+  \begin{itemize}
+  \item A pair \(s,t : C^{(1)} \to C^{(0)}\) of \textbf{source} and
+    \textbf{target} functions. For any arrow \(f \in C^{(1)}\), \(s(f)\) is its
+    source object, and \(t(f)\) is its target object. We usually write this as
+    \(f : s(f) \to t(f)\).
+  \item A function \(1: C^{(0)} \to C^{(1)}\) sending every object \(X \in
+    C^{(0)}\) to its \textbf{identity arrow} \(1_X : X \to X\).
+  \item A partial function \(C^{(1)} \times C^{(1)} \to C^{(1)}\) called
+    \textbf{composition}. \(m(g,f)\) is defined when \(s(g) = t(f)\).
+  \end{itemize}
+  These functions are required to satisfy two axioms. First, \(m\) must be an
+  associative operation:
+  \[%
+    m(h,m(g,f)) = m(m(h,g),f),
+  \]%
+  wherever defined. Second, \(1\) must be a left and right identity for \(m\):
+  \[%
+    m(f,1_{s(f)}) = m(1_{t(f)}, f) = f,
+  \]%
+  for any \(f \in C^{(1)}\).
+\end{definition}
+Usually composition \(m(g,f)\) in a category is written as \(g\circ f\) or by
+juxtaposition \(gf\).
+\begin{definition}
+  Given small categories \(C\) and \(D\), a \textbf{functor} \(F: C \to D\) is a
+  family of functions \(F^{(0)} : C^{(0)} \to D^{(0)}\) and \(F^{(1)} : C^{(1)}
+  \to D^{(1)}\) which preserve the functions \(s,t,1,\) and \(m\).
+\end{definition}
+Given a category \(C\), swapping the functions \(s\) and \(t\) yields a new
+category, \(C^\op\), called its \textbf{opposite category}. This is a
+generalization of the relation between \(\leq\) and \(\geq\) for preordered
+sets.
+
+There is one more perspective on categories which ties this back to the study on
+preorders. Recall, for a preordered set \(\pwrap{X,\leq}\), the classifying
+category \(\Cl\pwrap{X,\leq}\) is \emph{thin}---between any two objects \(x,y\)
+in \(\Cl\pwrap{X,\leq}\), there is at most one arrow \(x \to y\). A category
+\(C\) is an intensional form of a preorder. For a category, it is not enough to
+know that there exists an arrow between objects \(X\) and \(Y\), the specific
+choice of arrow \(f: X \to Y\) is now relevant. Similarly, \(\Set\) is the
+intesional analogue of truth values: it is not enough to know that a set \(X\)
+is nonempty; rather, the specific choice of element \(x \in X\) matters. This
+perspective tells us that universal constructions ofr categories are
+intensional/proof\-/relevant variants of the universal constructions for
+preorders. We saw some of these generalizations in the notes on Galois
+connections.
+
+\section{Indexed sets}
+
+We begin by describing a presheaf as an indexed set. By indexed set, we mean
+indexed in the following manner. Given a family of sets \(\bwrap{ X_\alpha \mid
+  \alpha \in I }\), we can describe this family with a function
+\[%
+  \pi : X \to I,
+\]%
+where \(X \eqdef \coprod_{\alpha \in I} X_\alpha\). Given a function \(x \in
+X\), \(x\) is contained in some \(X_\alpha\) for a unique \(\alpha\). \(\pi(x)\)
+is defined to be this index \(\alpha\). In the case where \(I\) is replaced with
+a category \(C\), we follow the same idea, but we introduce some extra structure
+to make the set \(X\) compatible with the arrows of \(C\).
+\begin{definition}
+  Let \(C\) be a small category. A \textbf{\(C\)\-/indexed set} is a set \(X\)
+  equipped with a function \(\pi : X \to C^{(0)}\) and a partial function
+  \(\mu : X \times C^{(1)} \to X\) satisfying the following constraints.
+  \begin{itemize}
+  \item \(\mu(x,f)\) is defined whenever \(t(f) = \pi(x)\).
+  \item \(\pi\pwrap{\mu(x,f)} = s(f)\).
+  \item \(\mu(x,1_{\pi(x)}) = x\).
+  \item If \(g \circ f\) is defined, then \(\mu(x,g\circ f) =
+    \mu(\mu(x,g),f)\), wherever defined.
+  \end{itemize}
+  Anticipating an equivalence between \(C\)\-/indexed sets and presheaves on
+  \(C\), we could write \(\restr{x}{f}\) in lieu of \(\mu(x,f)\).
+\end{definition}
+Calling this a \(C\)\-/indexed set is admiteddly uncommon. Another name for a
+\(C\)\-/indexed set is a \emph{discrete opfibration}. This is more precise, and
+it alludes to a more general notion, called a \emph{fibration of categories}. On
+the other hand, there is a hint of the notion of \texttt{Writer m} algebra in a
+\(C\)\-/indexed set. A category with one object, i.e., a category \(C\) where
+\(C^{(0)} \cong \bwrap{\ast}\), is the same structure as a monoid on the set
+\(C^{(1)}\). In this sense categories are generalized monoids, where the
+multiplication is a partial operation. Given that categories are generalized
+monoids, \(C\)\-/indexed sets are generalized modules.
+\begin{proposition}
+  Let \(C\) be a category with one object. Then a \(C\)\-/indexed set
+  \(\pwrap{X,\pi,\mu}\) is the same data as a right\-/action of the monoid
+  \(C^{(1)}\) on the set \(X\).
+\end{proposition}
+\begin{proof}
+  Consider a \(C\)\-/indexed set \(\pwrap{X,\pi,\mu}\). Since \(C^{(0)} \cong
+  \bwrap{\ast}\), the projection \(\pi : X \to C^{(0)}\) can only be the map
+  sending any element of \(X\) to the single element of \(C^{(0)}\). In this
+  case, \(\mu : X \times C^{(1)} \to X\) is total. We define the right action on
+  \(X\) by \(C^{(1)}\) by the rule
+  \[%
+    x \cdot f \eqdef \mu(x,f).
+  \]%
+  Conversely, given a right action of \(C^{(1)}\) on \(X\), we give \(X\) the
+  structure of a \(C\)\-/indexed set in the following manner. The projection
+  \(\pi\) is unique, since \(C^{(0)}\) is a singleton set. This leaves the map
+  \(\mu : X \times C^{(1)} \to X\), which we define using the same rule as
+  before.
+  \[%
+    \mu(x,f) \eqdef x \cdot f.
+  \]%
+\end{proof}
+Due to the above proposition, presheaves are occaisionally called \emph{right
+  \(C\)\-/modules}. Section V.7 of \cite{MacLane1994} describes the theory
+of right \(C\)\-/modules. Furthermore, to feed mathematicians' preference for
+infix notation, we will now write \(x \cdot f\) instead of \(\mu(x,f)\) for any
+\(C\)\-/indexed set.
+
+Given a \(C\)\-/indexed set \(\pwrap{X,\pi,\cdot}\), we can lift the categorical
+structure on \(C\) to \(X\). In order to give this category a name, we will
+anticipate presheaves and abuse notation slightly to call this category
+\(\el(X)\), the \emph{category of elements} of \(X\).
+\begin{definition}
+  Given the \(C\)\-/indexed set \(\pwrap{X,\pi,\cdot}\), its \textbf{category of
+    elements} is the following category \(\el(X)\). The objects of \(\el(X)\)
+  are the elements of \(X\). Furthermore, there is an arrow
+  \(\widetilde{f} : x \to y\) in \(\el(X)\) for every arrow \(f \in C^{(1)}\)
+  such that \(x = y \cdot f\). Composition of arrows in \(\el(X)\) is the same
+  as composition in \(C\).
+\end{definition}
+It can be helpful to have a picture for how the arrows in \(\el(X)\) are related
+to arrows in \(C\).
+\[%
+  \begin{tikzcd}
+    x \arrow[r,dashed,"\widetilde{f}"] \arrow[d,snake it] & y \arrow[d,snake it] \\
+    \pi(x) \arrow[r,"f"] & \pi(y)
+  \end{tikzcd}
+\]%
+Here a squiggly arrow \(x \leadsto A\) signifies the equation \(\pi(x) =
+A\). The arrow notation is suggestive: the projection \(\pi: X \to C\) defines a
+functor \(\widetilde{\pi} : \el(X) \to C\). We prove this now.
+\begin{proposition}
+  Let \(\widetilde{\pi} : \el(X) \to C\) be the map
+  \[%
+    x \mapsto \pi(x),\quad \widetilde{f} \mapsto f.
+  \]%
+  Then \(\widetilde{\pi}\) is a functor.
+\end{proposition}
+\begin{proof}
+  We need to show that \(\widetilde{\pi}\) preserves identities and
+  composition. Given an object \(x\) in \(\el(X)\) (i.e., an element
+  \(x \in X\)), its identity arrow \(1_x\) is presented by the identity
+  \(\widetilde{1_{\pi(x)}}\), so
+  \[%
+    \pi(1_x) = \pi(\widetilde{1_{\pi(x)}}) = 1_{\pi(x)},
+  \]%
+  so \(\widetilde{\pi}\) preserves identities. A similar argument works for
+  composition.
+\end{proof}
+The functor \(\widetilde{\pi}\) is what gives a \(C\)\-/indexed set the
+structure of a discrete opfibration. A fibration of categories is a
+categorification of \(\widetilde{\pi}\), adding more arrows in \(\el(X)\)
+besides the ones in \(C\).
+
+We now use \(C\)\-/indexed sets to study the category \(C\). While the objects
+of \(C\) may not be faithfully represented by sets, it is true that they are
+faithfully represented by \(C\)\-/indexed sets. This property is a
+generalization of the embedding of a preorder into its downward closed sets.
+\begin{definition}
+  Let \(X \in C^{(0)}\) be an object of \(C\). Its \textbf{indexed downset}
+  \(\dset X\) is the \(C\)\-/indexed set defined in the following manner.
+  \begin{itemize}
+  \item The elements of \(\dset X\) are arrows \(f : Y \to X\) in \(C\), for any
+    object \(Y\) in \(C\).
+  \item The projection \(\pi : \dset X \to C\) sends an arrow \(f : Y \to X\) to
+    the object \(Y\).
+  \item The multiplication \(\_ \cdot \_ : X \times C^{(1)} \to X\) sends an
+    arrow \(f : Y \to X\) and an arrow \(g : Z \to Y\) to the composition \(f
+    \circ g\):
+    \[%
+      f \cdot g \eqdef f \circ g.
+    \]%
+  \end{itemize}
+\end{definition}
+\begin{remark}
+  The category of elements for the indexed downset \(\dset X\) has a familiar
+  name. It is the \textbf{slice category} \(C_{/ X}\). This category is
+  sometimes called \(C \downarrow X\), an auspicious hint of the slice
+  category's connection to the downsets of a preordered set.
+\end{remark}
+In order to make sense of how \(C\) is embedded into its \(C\)\-/indexed sets,
+we need to make a notion of \(C\)\-/indexed function.
+\begin{definition}
+  Let \(X\) and \(Y\) be a pair of \(C\)\-/indexed sets. A
+  \textbf{\(C\)\-/indexed function} \(\phi : X \to Y\) is a function \(\phi_*\)
+  between the underlying sets of \(X\) and \(Y\) which preserves \(\pi\) and
+  \(\_\cdot\_\), i.e.,
+  \[%
+    \pi_Y(\phi_* x) = \pi_X(x), \quad \pwrap{\phi_* x} \cdot_Y f = \phi_* \pwrap{x
+      \cdot_X f}.
+  \]%
+  \(C\)\-/indexed functions may be composed, by composing the underlying
+  functions between sets. Furthermore, there is an obvious identity
+  function. This gives a category of \(C\)\-/indexed sets, which we call
+  \(\iSet{C}\).
+\end{definition}
+Given an arrow \(f: X \to Y\) in \(C\), we obtain an indexed function \(f_* :
+\dset X \to \dset Y\), given by postcomposition:
+\[%
+  f_*\pwrap{g : Z \to X} \eqdef f \circ g : Z \to Y.
+\]%
+\begin{lemma}[\(C\)\-/indexed Yoneda lemma]
+  The mapping \(X \mapsto \dset X\) and \(f \mapsto f_*\) defines a functor
+  \[%
+    \dset : C \to \iSet{C}.
+  \]%
+  Furthermore, this functor is fully faithful. Finally, given an arbitrary
+  \(C\)\-/indexed set \(A\), there is a bijection
+  \[%
+    \iSet{C}\pwrap{\dset X, A} \cong \bwrap{ a \in A \mid \pi(a) = X }.
+  \]%
+\end{lemma}
+\begin{proof}
+  We use the only trick in category theory: chase \texttt{refl}.  We first argue
+  that \(\dset\) is a functor. Since \(f_*\) is defined by composition in \(C\),
+  this is straightforward. We now show that \(\dset\) is faithful.  Let
+  \(f, g : X \to Y\) be two arrows in \(C\). Suppose \(f_* = g_*\). We need to
+  prove \(f = g\). The identity arrow \(1_X : X \to X\) is an element of
+  \(\dset X\). Then
+  \[%
+    f = f_*(1_X) = g_*(1_X) = g,
+  \]%
+  so \(\dset\) is faithful. Next we show \(\dset\) is full. Let \(\phi : \dset X
+  \to \dset Y\) be an indexed function. Then \(\phi_*(1_X)\) is some arrow \(f :
+  X' \to Y\). Since \(\phi\) preserves the projection \(\pi\), \(X' = X\). What
+  is left is to argue that \(\phi_* = f_*\). Indeed, for any element \(g: Z \to
+  X\) in \(\dset X\),
+  \[%
+    f_* g = f \circ g = f \cdot g = \phi_*(1_X) \cdot g = \phi_*(1_X \cdot g) =
+    \phi_*(g).
+  \]%
+  This shows \(\phi_* = f_*\). Since \(\phi\) is arbitrary, this shows that
+  \(\dset\) is full; hence \(\dset\) is fully faithful.
+
+  Finally, we prove the bijection. Let \(\phi_0 : \dset X \to A\) be an indexed
+  function. \({\phi_0}_*(1_X)\) is an element of \(A\); call it
+  \(a(\phi_0)\). We will show that \(a : \phi_0 \mapsto a(\phi_0)\) is a
+  bijection. We need an inverse to \(a\). Given an element \(a_0 \in A\) such
+  that \(\pi(a_0) = X\), we define an indexed function
+  \(\phi(a_0) : \dset X \to A\) in the following manner. Given an element
+  \(f : Y \to X\) in \(\dset X\), define
+  \[%
+    \phi(a_0)_*(f) \eqdef a_0 \cdot f \in A.
+  \]%
+  Since \(\pi(a_0) = X\), this function is well\-/defined, and it is
+  straightforward to show that this function preserves \(\pi\) and
+  \(\_\cdot\_\). Given an indexed function \(\phi_0 : \dset X \to A\) and an
+  element \(f : Y \to X\) in \(\dset X\),
+  \[%
+    \phi(a(\phi_0))_*(f) = a(\phi_0) \cdot f = {\phi_0}_*(1_X) \cdot f =
+    {\phi_0}_*(1_X \cdot f) = {\phi_0}_*(f). 
+  \]%
+  Thus \(\phi(a(\phi_0)) = \phi_0\). Similarly given an element \(a_0 \in A\)
+  such that \(\pi(a_0) = X\),
+  \[%
+    a(\phi(a_0)) = \phi(a_0)_* (1_X) = a_0 \cdot 1_x = a_0.
+  \]%
+  Therefore \(a(\phi(a_0)) = a_0\). This shows that \(a(\_)\) and \(\phi(\_)\)
+  are inverses, proving the desired bijection.
+\end{proof}
+We have shown that \(\dset\) is an embedding. When we did this for preorders, we
+used this embedding to lift operations on truth\-/values to universal
+constructions on a preorder. We do the analogous thing for indexed sets, lifting
+operations on sets to universal constructions on a category.
+
+\subsection*{Indexed set theory}
+
+Test
+
+\section{Presheaves: Indexed sets as functors}
+
+\newpage
+
+\bibliographystyle{apalike}
+\bibliography{../refs}
+
+\end{document}

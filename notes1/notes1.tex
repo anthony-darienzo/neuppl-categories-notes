@@ -1,0 +1,586 @@
+\documentclass{../thesis-note}
+
+\title{Categorical Semantics and Categorical Logic}
+\author{NeuPPL Category Seminar}
+\date{28 June 2024}
+
+\definecolor{NortheasternRed}{RGB}{200,16,46}
+
+\titlecolor{NortheasternRed}
+
+\newcommand\Prop[1]{\text{{\normalfont{Prop}}}{\pwrap{{#1}}}}
+\DeclareMathOperator\Mod{\normalfont Mod}
+
+\usepackage{bussproofs}
+
+\begin{document}
+
+\maketitle%
+
+\section{Introduction: A Proposition for a Metatheory}
+
+Categorical logic and categorical semantics are a generalization of a certain
+triangle of structures in propositional logic. First, there is the
+\emph{propositional theory} itself. This is the propositional version of an
+\emph{equational theory}. It is syntax, and like syntax in a programming
+language, we can study transformations between different languages:
+\emph{translations}. The second structure is an algebraic model, called the
+\emph{classifying category} of the theory. The algebraic model plays the role of
+an \emph{equational theory} for the syntax. If we temporarily fast\-/forward to
+the simply\-/typed \(\lambda\)\-/calculus, we find an example of structure
+appearing in the algebraic model.
+\begin{indented}
+  \emph{%
+    Well\-/typed \(\lambda\)\-/terms do not form a Cartesian\-/closed
+    category. However, if we identify terms up to \(\beta\eta\)\-/equivalence,
+    the resultant equivalence classes do form a Cartesian\-/closed category.
+  }%
+\end{indented}
+\noindent This is the general idea of the algebraic model: find structure in the
+syntax by identifying terms which are proof\-/theoretically the same. The third
+structure is the \emph{semantics} of the logic. The semantics is the
+``ground\-/truth'' of the logic. We can think of this as observational
+equivalence. Semantic truth, i.e., ``\(\vDash\)'' is difficult to reason with,
+so we refer to the first two models to explore as much of the semantics as
+possible while remaining tractable. For this reason, soundness and completeness
+theorems are valuable.
+\begin{indented}
+  \emph{Soundness:} the first two models are not more powerful than the
+  semantics.\\
+  \emph{Completeness:} the first two models are at least as powerful as the
+  semantics.
+\end{indented}
+Let us begin by describing this triangle for propositional logic. This will be a
+high\-/level overview of the ideas in Chapter 3 of~\cite{Halvorson2019}.
+
+\subsection*{Syntax}
+
+We will work in the classical fragment of propositional logic. Given a set of
+atomic propositions \(P,Q,\ldots\), we can form derived propositions \(P \vee Q,
+\neg P, P \to Q,\ldots\) using the connectives
+\[%
+  \wedge, \vee, \Rightarrow, \neg, \top, \bot.
+\]%
+The meaning of these connectives come from the usual introduction and
+elimination rules. These allow us to build Gentzen\-/style proof trees, shown
+below.
+\begin{gather*}
+  \begin{array}{c}
+    A \in \Gamma \\\hline \Gamma \vdash A
+  \end{array}\quad\quad
+  \begin{array}{c}
+    \Delta \vdash A \quad \Delta \subseteq \Gamma \\\hline \Gamma \vdash A
+  \end{array}\quad\quad
+  \begin{array}{c}
+    \Gamma \vdash A \quad \Delta, A \vdash B\\\hline \Gamma,\Delta \vdash B
+  \end{array}\\
+  \begin{array}{c}
+    \Gamma \vdash A \quad \Gamma \vdash B \\\hline \Gamma \vdash A \wedge B
+  \end{array}\quad\quad
+  \begin{array}{c}
+    \Gamma \vdash A \wedge B \\\hline \Gamma \vdash A \quad \Gamma \vdash B
+  \end{array}\\
+  \begin{array}{c}
+    \Gamma \vdash A \\\hline \Gamma \vdash A \vee B
+  \end{array}\quad\quad
+  \begin{array}{c}
+    \Gamma \vdash B \\\hline \Gamma \vdash A \vee B
+  \end{array}\quad\quad
+  \begin{array}{c}
+    \Gamma, A \vdash C \quad \Gamma, B \vdash C \\\hline \Gamma, A \vee B \vdash C
+  \end{array}\\
+  \begin{array}{c}
+    \Gamma, A \vdash B \\\hline \Gamma \vdash A \Rightarrow B
+  \end{array}\quad\quad
+  \begin{array}{c}
+    \Gamma \vdash A \Rightarrow B \\\hline \Gamma, A \vdash B
+  \end{array}\quad\quad
+  \left(
+    \begin{array}{c}
+      \Gamma \vdash A \Rightarrow B \wedge B \Rightarrow A \\\hline\hline \Gamma \vdash A
+      \Leftrightarrow B
+    \end{array}
+  \right)\\
+  \begin{array}{c}
+    \Gamma \vdash A \to \bot \\\hline\hline \Gamma \vdash \neg A
+  \end{array}\quad\quad
+  \begin{array}{c}
+    \Gamma \vdash \neg \neg A \\\hline \Gamma \vdash A
+  \end{array}\\
+  \begin{array}{c}
+    \Gamma \vdash A \\\hline \Gamma \vdash \top
+  \end{array}\quad\quad
+  \begin{array}{c}
+    \Gamma \vdash \bot \\\hline \Gamma \vdash A
+  \end{array}\\
+\end{gather*}
+\begin{definition}
+  A \textbf{propositional theory} is a pair \(T = \pwrap{\Sigma,\Delta}\)
+  consisting of a set \(\Sigma\) of atomic propositions, called the
+  \textbf{signature} of the theory, and a set \(\Delta\) of sequents of derived
+  propositions of \(\Sigma\), called the \textbf{axioms} of the theory.
+\end{definition}
+Propositional logic is the study of propositional theories. Using the axioms of
+a theory \(T\), we can form a new relation \(\vdash_T\), where \(\Gamma \vdash_T
+A\) signifies the existence of a proof\-/tree whose leaves are axioms of \(T\)
+such that every internal node is an application of a classical introduction or
+elimination rule. One could pause here and study this relation in depth, but we
+will keep going. Propositional theories have their own notion of transpiler.
+\begin{definition}
+  Let \(T_1\) and \(T_2\) be two propositional theories. A \textbf{translation}
+  \(F: T_1 \to T_2\) is a map sending atomic propositions in \(\Sigma_1\) to
+  derived propositions of \(\Sigma_2\). By declaring that this map preserves the
+  logical connectives, this extends to a map from derived propositions of
+  \(\Sigma_1\) to derived propositions of \(\Sigma_2\). We require that \(F\)
+  satisfy the additional constraint:
+  \[%
+    \Gamma \vdash_{T_1} A \implies F\Gamma \vdash_{T_2} F A.
+  \]%
+\end{definition}
+We are often interested in asking whether two theories \(T_1\) and \(T_2\) have
+the same level of expressivity and proving power. Given that we have a notion of
+arrow between theories, we might try to study \emph{isomorphisms}. However,
+the constraint that \(GF = \id : T_1 \to T_1\) for a pair of translations \(F:
+T_1 \to T_2\) and \(G: T_2 \to T_1\) is often too restrictive. For one, atomic
+propositions must be sent to themselves, but the image of a derived proposition
+under a translation is never atomic. Therefore, \(F\) must send any atomic
+proposition to an atomic proposition. If we have an isomorphism, the same must
+be true for \(G\). This shows that any isomorphism of propositional theories
+must be just a relabeling of the symbols. Not only that, theories also have
+axioms, and isomorphisms do not care about the axioms. We are led to a weakening
+of isomorphism which is still good enough to model the logic inside a
+propositional theory.
+\begin{definition}
+  Two translations \(F, F' : T_1 \to T_2\) are \textbf{provably equivalent} or
+  \textbf{homotopic} in the case that, for any \(T_1\)\-/proposition \(\phi\),
+  \[%
+    \cdot \vdash_{T_2} F\phi \Leftrightarrow F' \phi.
+  \]%
+  An \textbf{equivalence} of theories is a pair of translations \(F: T_1 \to
+  T_2\) and \(G: T_2 \to T_1\) such that \(GF\) is provably equivalent to
+  \(\id_{T_1}\) and \(FG\) is provably equivalent to \(\id_{T_2}\), i.e.,
+  for any \(T_1\) proposition \(\phi\) and \(T_2\) proposition \(\psi\),
+  \[%
+    \cdot \vdash_{T_1} \phi \Leftrightarrow GF \phi \text{ and } \cdot
+    \vdash_{T_2} \psi \Leftrightarrow FG \psi.
+  \]%
+\end{definition}
+If a translation \(F: T_1 \to T_2\) is part of an equivalence, then \(F\)
+resembles a \emph{fully abstract} compiler. Our metatheory of translations
+should explain when equivalences exist, and it should provide methods to
+construct them.
+
+\subsection*{Semantics}
+
+I mentioned that equivalences are good enough to model the logic inside a
+propositional theory. Let's take a moment to formalize what is meant by
+``modeling the logic'' inside a theory. For classical propositional logic, the
+only thing that matters is truth tables, essentially. Let \(\Omega \eqdef
+\bwrap{\True, \False}\) be the set of classical truth values.
+\begin{definition}
+  Let \(\Sigma\) be a propositional signature. An \textbf{interpretation} (or,
+  if you want, a \textbf{denotational semantics}) for the signature \(\Sigma\)
+  is a map \(\fbb{\cdot}\) from atomic propositions in \(\Sigma\) to truth
+  values \(\Omega\)
+\end{definition}
+We can extend the map from a denotational semantics \(\fbb\cdot : \Sigma \to
+\Omega\) to derived propositions in \(\Sigma\). We do this by sending the
+logical connectives to the appropriate boolean operations
+\begin{gather*}
+  \fbb{A \wedge B} \eqdef \fbb{A} \,\texttt{and}\, \fbb{B} \quad\quad
+  \fbb{A \vee B} \eqdef \fbb{A} \,\texttt{or}\, \fbb{B} \quad\quad
+  \fbb{A \Rightarrow B} \eqdef
+  \texttt{if}\,\fbb{A}\,\texttt{then}\,\fbb{B}\,\texttt{else}\,\True\\
+  \fbb{\neg A} \eqdef \texttt{not}\,\fbb{A}\quad\quad
+  \fbb{\top} \eqdef \True \quad\quad
+  \fbb{\bot} \eqdef \False.
+\end{gather*}
+\begin{definition}
+  Let \(T\) be a propositional theory with signature \(\Sigma\) and axioms
+  \(\Delta\). A \textbf{model} of the theory \(T\) is an interpretation
+  \(\fbb\cdot\) of \(\Sigma\) such that, for any sequent \(\phi \vdash \psi\) in
+  \(\Delta\), \( \fbb{\phi} \leq \fbb{\psi}\), where the ordering \(\leq\) is
+  the usual ordering on \(\Omega\), interpreted as a boolean algebra.  If we
+  give the model a name, say, \(M : \Sigma \to \Omega\), then we define the
+  notation \(\phi \vDash_M \psi\) to mean \(\fbb{\phi}^M \leq \fbb{\psi}^M\).
+\end{definition}
+We can treat the semantics as the ground\-/truth of the propositional theory. We
+are concerned with which propositions are true, and the classical introduction
+and elimination rules help us explore the space of true propositions by
+identifying operations which preserve the ground truth. This is a soundness
+theorem.
+\begin{theorem}[Soundness theorem]
+  Let \(\fbb{\cdot}^M\) be a model of a propositional theory \(T\). Suppose
+  \(\phi \vdash_T \psi\) for some propositions \(\phi\) and \(\psi\). Then
+  \(\phi \vDash_M \psi\).
+\end{theorem}
+
+Similarly, our notion of translation can also be justified by the
+semantics. Consider a translation \(F: T_1 \to T_2\), and suppose
+\(\fbb{\cdot}^M\) is a model of \(T_2\). We obtain a model of
+\(\fbb{\cdot}^{F^* M}\) of \(T_1\), given by composition, essentially
+\[%
+  \Sigma_1 \xrightarrow{F} \text{Prop}(\Sigma_2) \xrightarrow{\fbb{\cdot}^M}
+  \Omega.
+\]%
+\begin{proposition}
+  \(\fbb{\cdot}^{F^* M}\) is indeed a model of \(T_1\).
+\end{proposition}
+\begin{proof}
+  We need to show that \(F^*\fbb{\cdot}\) preserves the axioms of \(T_1\). Let
+  \(\phi \vdash \psi\) be such an axiom. Since \(F\) is a translation, \(F\phi
+  \vdash_{T_2} F\psi\). By the soundness theorem, \(F\phi \vDash_M
+  F\psi\). Finaly, observe that
+  \[%
+    \fbb{\phi}^{F^* M} \eqdef \fbb{F\phi}^M.
+  \]%
+  Therefore \(F\phi \vDash_M F\psi\) implies \(\phi \vDash_{F^* M} \psi\), as
+  desired.
+\end{proof}
+Recall that our notion of translation was too strict to have interesting
+inverses. Here is another reason why we need to consider ``homotopic''
+translations.
+\begin{proposition}
+  Let \(F, G : T_1 \to T_2\) be a pair of translations. If \(F\) and \(G\) are
+  homotopic, then, for any model \(\fbb{\cdot}^M\) of \(T_2\), we have, for any
+  derived proposition \(\phi\) of \(T_1\),
+  \[%
+    \fbb{\phi}^{F^* M} = \fbb{\phi}^{G^* M} : \Omega.
+  \]%
+\end{proposition}
+\begin{proof}
+  Since \(F\) and \(G\) are homotopic, the sequent \(\cdot \vdash_{T_2} F\phi
+  \leftrightarrow G\phi\) is provable in \(T_2\). Since \(M\) is a model, this
+  means
+  \begin{lstlisting}[language=ml,escapeinside={(*}{*)}]
+    if True
+    then ((if (*$\fbb{F\phi}^M$*) then (*$\fbb{G\phi}^M$*) else True)
+          and
+          (if (*$\fbb{G\phi}^M$*) then (*$\fbb{F\phi}^M$*) else True))
+    else
+      True      
+  \end{lstlisting}
+  evaluates to \(\True\). Furthermore, the laws of the boolean operations imply
+  that the above expression is \(\True\) if and only if
+  \(\fbb{F\phi}^M \leq \fbb{G\phi}^M\) and vice versa. Antisymmetry now implies
+  \(\fbb{\phi}^{F^* M} = \fbb{\phi}^{G^* M}\), as desired.
+\end{proof}
+In fact, we could have defined two translations to be homotopic in the case that
+they are indistinguishable in any model. This was the original approach, when
+homotopy of translations was defined in~\cite{Ahlbrandt1986}. Proving that this
+is equivalent to the syntax\-/focused approach mentioned above requires a
+completeness theorem for propositional theories.
+
+\begin{remark}
+  To make sense of an interpretation and model, we only need a notion of truth
+  value and boolean operations on truth values. Therefore, we could replace
+  \(\Omega\) with any boolean algebra \(B\) and define a notion of
+  \textbf{\(B\)\-/valued model} \(\Sigma \to B\). All the results in this
+  passage transfer to \(B\)\-/valued models.
+\end{remark}
+
+\subsection*{Algebra}
+
+We now present the third side of the triangle. In the case of propositional
+logic, the equational theory is trivial. However the change in perspective from
+introducing category theory introduces the key ideas in categorical logic, and
+it shows that a propositional theory is fully subsumed by its classifying
+category.
+
+\begin{definition}
+  Let \(T\) be a propositional theory. Notice that the set of derived
+  propositions \(\Prop{T}\) has a preorder, given by \(\vdash_T\):
+  \[%
+    \phi \leq \psi \text{ if and only if } \phi \vdash_T \psi.
+  \]%
+  In the warm\-/up we saw that we can define the classifying category of a
+  preorder. The \textbf{classifying category} of the theory \(T\) is the
+  category
+  \[%
+    \Cl\pwrap{T} \eqdef \Cl\pwrap{\Prop{T},\vdash_T}.
+  \]%
+  Explicitly, the objects of \(\Cl\pwrap{T}\) are derived propositions in
+  \(\Prop{T}\), and there exists a unique arrow \(\phi \to \psi\) in
+  \(\Cl\pwrap{T}\) in the case that \(\phi \vdash_T \psi\).
+\end{definition}
+I am choosing to call this category the classifying category of \(T\),
+following~\cite{Jacobs1999}. There are many other names for this category;
+another common name is the \emph{syntactic category} of the theory \(T\). The
+rest of this section will describe how a propositional theory can be described
+in terms of classifying categories.
+
+For example, a common thing to ask when given a category is \emph{what are its
+  isomorphisms?} Since there is at most one arrow between two objects in
+\(\Cl\pwrap{T}\), the only arrow \(\phi \to \phi\) must be the identity arrow,
+for any object \(\phi\) in \(\Cl\pwrap{T}\). This means two objects \(\phi\) and
+\(\psi\) are isomorphic in \(\Cl\pwrap{T}\) if and only if there exist arrows
+\(\phi \to \psi\) and \(\psi \to \phi\). Unpacking the meaning of an arrow in
+\(\Cl\pwrap{T}\), we obtain the following proposition.
+\begin{proposition}
+  Let \(T\) be a propositional theory, and let \(\phi\) and \(\psi\) be two
+  objects of \(\Cl\pwrap{T}\), i.e., derived propositions of \(T\). \(\phi\) and
+  \(\psi\) are isomorphic in \(\Cl\pwrap{T}\) if and only if \(\phi \vdash_T
+  \psi\) and \(\psi \vdash_T \phi\), equivalently,
+  \[%
+    \cdot \vdash_T \phi \Leftrightarrow \psi.
+  \]%
+\end{proposition}
+
+\subsubsection*{Translations}
+
+We can describe translations as functors.
+\begin{proposition}
+  Let \(F: T_1 \to T_2\) be a translation between propositional theories. Then
+  \(F\) defines a mapping \(\Prop{T_1} \to \Prop{T_2}\) which is
+  monotonic. Therefore \(F\) defines a functor
+  \[%
+    \Cl\pwrap{F} : \Cl\pwrap{T_1} \to \Cl\pwrap{T_2}.
+  \]%
+  Furthermore, two translations \(F_1, F_2: T_1 \to T_2\) are provably
+  equivalent (i.e., homotopic) if and only if \(\Cl\pwrap{F_1}\) and
+  \(\Cl\pwrap{F_2}\) are naturally isomorphic.
+\end{proposition}
+\begin{proof}
+  The statement that \(F\) is a monotonic map means, for any pair of derived
+  propositions \(\phi,\psi \in \Prop{T_1}\),
+  \[%
+    \phi \vdash_{T_1} \psi \text{ implies } F\phi \vdash_{T_2} F\psi.
+  \]%
+  This is part of the definition of a translation. In the warm\-/up, we showed
+  that a monotonic map between preordered sets defines a functor between their
+  classifying categories. An object of \(\Cl\pwrap{T_1}\) is a derived
+  proposition \(\phi \in \Prop{T_1}\); we define
+  \[%
+    \Cl\pwrap{F}\phi \eqdef F\phi.
+  \]%
+  We move to the final part of the proposition. Assume \(F_1\) and \(F_2\) are
+  provably equivalent translations from \(T_1\) to \(T_2\). The statement that
+  \(\Cl\pwrap{F_1}\) and \(\Cl\pwrap{F_2}\) are naturally isomorphic unpacks to
+  the following. For any arrow \(\phi \to \psi\) in \(\Cl\pwrap{T_1}\), there
+  exists arrows \(F_1 \phi \to F_2 \phi\), \(F_1 \psi \to F_2 \psi\), \(F_2 \phi
+  \to F_1 \phi\), and \(F_2 \psi \to F_1 \psi\) fitting into a pair of commuting
+  squares in \(\Cl\pwrap{T_2}\).
+  \[
+    \begin{array}{cc}
+      \begin{tikzcd}
+        F_1 \phi \arrow[r] \arrow[d] & F_1 \psi \arrow[d] \\
+        F_2 \phi \arrow[r] & F_2 \psi
+      \end{tikzcd} &
+      \begin{tikzcd}
+        F_2 \phi \arrow[r] \arrow[d] & F_2 \psi \arrow[d] \\
+        F_1 \phi \arrow[r] & F_1 \psi.
+      \end{tikzcd}
+    \end{array}
+  \]%
+  We now need to prove that these squares exist. Let \(\phi \to \psi\) be an
+  arrow in \(\Cl\pwrap{T_1}\), so \(\phi \vdash_T \psi\). Since \(F_1\) and
+  \(F_2\) are translations, the following sequents are provable in \(T_2\):
+  \begin{gather*}
+    F_1 \phi \vdash_{T_2} F_1 \psi \quad F_2 \phi \vdash_{T_2} F_2 \psi.
+  \end{gather*} 
+  Since \(F_1\) and \(F_2\) are provably equivalent, the following sequents are
+  provable in \(T_2\):
+  \begin{gather*}%
+    F_1 \phi \vdash_{T_2} F_2 \phi \quad F_2 \phi \vdash_{T_2} F_1 \phi\\
+    F_1 \psi \vdash_{T_2} F_2 \psi \quad F_2 \psi \vdash_{T_2} F_1 \psi.
+  \end{gather*}%
+  These six sequents define six arrows in \(\Cl\pwrap{T_2}\). These six arrows
+  can be arranged to make the sides in two commuting squares above. Thus,
+  \(\Cl\pwrap{F_1}\) and \(\Cl\pwrap{F_2}\) are naturally isomorphic.
+
+  Conversely, assume that \(\Cl\pwrap{F_1}\) and \(\Cl\pwrap{F_2}\) are
+  naturally isomorphic. Then for any arrow \(\phi \to \psi\) in
+  \(\Cl\pwrap{T_1}\) we can find two commuting squares of the form shown
+  above. Let \(\phi\) be an arbitrary derived proposition in \(\Prop{T_1}\),
+  i.e., an arbitrary object of \(\Cl\pwrap{T_1}\). If we apply this to the
+  identity arrow \(\phi \to \phi\), then we obtain arrows
+  \(F_1 \phi \to F_2 \phi\) and \(F_2 \phi \to F_1 \phi\) (these are the
+  vertical sides of the two squares). Unpacking the meaning of an arrow in
+  \(\Cl\pwrap{T_2}\), this means
+  \[%
+    F_1 \phi \vdash_{T_2} F_2\phi \quad F_2\phi \vdash_{T_2} F_1 \phi.
+  \]%
+  Since \(\phi\) is arbitrary, this means \(F_1\) and \(F_2\) are provably
+  equivalent.
+\end{proof}
+Recall that two translations \(F: T_1 \to T_2\) and \(G: T_2 \to T_1\) define an
+equivalence of theories in the case that \(GF\) and \(FG\) are provably
+equivalent to \(\id_{T_1}\) and \(\id_{T_2}\). The above proposition determines
+when two translations are equivalent in terms of their associated functors. This
+gives us the following corollary.
+\begin{corollary}
+  Let \(F: T_1 \to T_2\) and \(G: T_2 \to T_1\) be a pair of translations. \(F\)
+  and \(G\) define an equivalence of theories if and only if \(\Cl\pwrap{F}\) and
+  \(\Cl\pwrap{G}\) define an equivalence of categories
+  \begin{gather*}
+    \Cl\pwrap{F} : \Cl\pwrap{T_1} \to \Cl\pwrap{T_2}\\
+    \Cl\pwrap{G} : \Cl\pwrap{T_2} \to \Cl\pwrap{T_1}.
+  \end{gather*}
+\end{corollary}
+We can actually strengthen the above result on translations and fully identify
+which functors \(\Cl\pwrap{T_1} \to \Cl\pwrap{T_2}\) come from translations
+\(T_1 \to T_2\). This requires a finer description of the structure of
+\(\Cl\pwrap{T}\), which we will get to later. Let's just state the result now.
+\begin{proposition}
+  Let \(F: T_1 \to T_2\) be a translation. Then
+  \(\Cl\pwrap{F}: \Cl\pwrap{T_1} \to \Cl\pwrap{T_2}\) satisfies the following
+  properties.
+  \begin{itemize}
+  \item \(\Cl\pwrap{F}\) preserves finite limits (i.e., infima);
+  \item \(\Cl\pwrap{F}\) preserves finite colimits (i.e., suprema);
+  \item \(\Cl\pwrap{F}\) preserves exponentials (i.e., \(\Rightarrow\)).
+  \end{itemize}
+  Furthermore, any functor \(\Cl\pwrap{T_1} \to \Cl\pwrap{T_2}\) satisfying
+  these properties is described by a translation \(T_1 \to T_2\).
+\end{proposition}
+
+\subsubsection*{Interpretations}
+
+Perhaps what is more surprising is that interpretations of a propositional
+theory \(T\) into a boolean algebra \(B\) can also be described as a functor. A
+boolean algebra has a canonical partial order associated to it: for any elements
+\(a,b\) in a boolean algebra \(B\), we write \(a \leq b\) in the case that \(a
+\wedge b = a\). A partial order is a special kind of preorder, so we can refer
+to the classifying category of a boolean algebra.
+\begin{definition}
+  Given a boolean algebra \(B\), the \textbf{classifying category} of \(B\) is
+  the classifying category of the canonical partial order on \(B\):
+  \[%
+    \Cl\pwrap{B} \eqdef \Cl\pwrap{B,\leq}.
+  \]%
+\end{definition}
+Similar to the story with translations, any boolean algebra homomorphism \(F:
+B_1 \to B_2\) defines a functor \(\Cl\pwrap{F} : \Cl\pwrap{B_1} \to
+\Cl\pwrap{B_2}\), since the set of objects of \(\Cl\pwrap{B}\) are the elements
+of \(B\).
+
+On the other hand, models are also functors. Given a propositional
+theory \(T\) and a \(B\)\-/valued model \(\fbb{\cdot}^M : T \to B\), we
+obtain a functor \(M : \Cl\pwrap{T} \to \Cl\pwrap{B}\) by setting
+\[%
+  M\pwrap{\phi : \Cl\pwrap{T}} \eqdef \fbb{\phi : \Prop{T}}^M.
+\]%
+\begin{proposition}
+  \(M\) is indeed a functor from \(\Cl\pwrap{T}\) to \(\Cl\pwrap{B}\).
+\end{proposition}
+\begin{proof}
+  We need to verify that \(M\) sends arrows of \(\Cl\pwrap{T}\) to arrows of
+  \(\Cl\pwrap{B}\). Let \(\phi \to \psi\) be an arrow in \(\Cl\pwrap{T}\). Since
+  \(\fbb{\cdot}^M\) is a model, this implies
+  \[%
+    \fbb{\phi}^M \leq \fbb{\psi}^M.
+  \]%
+  Therefore, there exists an arrow \(\fbb{\phi}^M \to \fbb{\psi}^M\) in
+  \(\Cl\pwrap{B}\). Since \(M(\phi) = \fbb{\phi}^M\), this is an arrow \(M(\phi)
+  \to M(\psi)\), as desired.
+\end{proof}
+Given a translation \(F: T_1 \to T_2\), recall we obtained a ``pull\-/back''
+operation
+\[%
+  F^* : \Mod(T_2,B) \to \Mod(T_1,B),
+\]%
+where \(\Mod(T,B)\) denotes the set of \(B\)\-/valued models of the theory
+\(T\). From the perspective of the classifying categories, this operation is
+just composition.
+\begin{theorem}
+  Let \(F: T_1 \to T_2\) be a translation between propositional theories. Let
+  \(\fbb{\cdot}^M : T_2 \to B\) be a \(B\)\-/valued model of \(T_2\). Then
+  \(\fbb{\cdot}^{F^* M} : T_1 \to B\) is the pulled\-/back model of \(T_1\)
+  under \(F\). From these we obtain functors
+  \begin{gather*}
+    \Cl\pwrap{F} : \Cl\pwrap{T_1} \to \Cl\pwrap{T_2}\\
+    M : \Cl\pwrap{T_2} \to \Cl\pwrap{B} \\
+    F^* M: \Cl\pwrap{T_1} \to \Cl\pwrap{B}.
+  \end{gather*}
+  These functors fit into a commuting diagram
+  \[%
+    \begin{tikzcd}
+      \Cl\pwrap{T_2} \arrow[r,"M"] & \Cl\pwrap{B} \\
+      \Cl\pwrap{T_1}. \arrow[u,"\Cl\pwrap{F}"] \arrow[ur,dashed, "F^*M", swap] &
+    \end{tikzcd}
+  \]%
+  In other words, \(F^* M = M \circ \Cl\pwrap{F}\).
+\end{theorem}
+The key observation behind all of the proofs so far is that the classifying
+category of a theory is almost a copy of the theory. We will see later a
+construction, called the \emph{internal logic} of a category, which will recover
+the original theory from its classifying category.
+
+%\subsubsection*{Finer structure}
+
+\newpage
+\bibliographystyle{apalike}
+\bibliography{../refs}
+\newpage
+\appendix
+\section{The Lindenbaum Algebra}
+
+The Lindenbaum algebra is another algebraic model of a propositional theory. We
+saw that, for the purposes of understanding the semantics of a theory, we only
+need equivalence classes of translations up to homotopy/provable
+equivalence. This was another point in a pattern of observations that the syntax
+of propositional logic hides certain symmetries which appear from the
+introduction and elimination rules. The Lindenbaum algebra of a propositional
+theory is a quotient
+\[%
+  \faktor{\text{Propositions}}{\text{Proof theory}}.
+\]%
+This is the simplest form of an \emph{equational theory}. Traditionally, the
+algebraic semantics was given by a boolean algebra of propositions modulo the
+double\-/sided implication \(\leftrightarrow\).
+\begin{definition}
+  Let \(T\) be a classical propositional theory. The \textbf{Lindenbaum algebra}
+  is the boolean algebra \(\pwrap{L(T),\leq}\) of equivalence classes of
+  propositions \(\fb{\phi}\), where two propositions \(\phi\) and \(\phi'\) are
+  in the same class in the case
+  \[%
+    \phi \vdash_T \phi' \text{ and } \phi' \vdash_T \phi.
+  \]%
+  The ordering \(\leq\) is given by
+  \[%
+    \fb\phi \leq \fb\psi \stackrel{\text{def}}{\equiv} \phi \vdash_T \psi.
+  \]%
+\end{definition}
+There are a few nice properties of the Lindenbaum algebra, which highlights the
+framework in \cite{Halvorson2019}.
+\begin{proposition}
+  Let \(T\) be a propositional theory. The mapping \(\phi \mapsto \fb{\phi}\)
+  defines a \(L(T)\)\-/valued model of \(T\). This mapping is called the
+  \textbf{canonical interpretation} of \(T\) in \(L(T)\).
+\end{proposition}
+\begin{proposition}
+  There is a bijective correspondence between provable\-/equivalence classes of
+  translations \(F: T_1 \to T_2\) and boolean algebra homomorphisms
+  \(L(T_1) \to L(T_2)\), fitting into a square, where the vertical arrows are
+  the canonical interpretations.
+  \[%
+    \begin{tikzcd}
+      T_1 \arrow[r,"F"] \arrow[d] & T_2 \arrow[d] \\
+      L(T_1) \arrow[r,dashed] & L(T_2).
+    \end{tikzcd}
+  \]%
+\end{proposition}
+\begin{proposition}
+  Let \(T\) be a propositional theory and \(B\) a boolean algebra. There is a
+  bijective correspondence between \(B\)\-/valued models of \(T\) and boolean
+  algebra homomorphisms \(L(T) \to B\), related by the canonical interpretation
+  \[%
+    \begin{tikzcd}
+      L(T) \arrow[r,dashed] & B\\
+      T. \arrow[u] \arrow[ur] &
+    \end{tikzcd}
+  \]%
+\end{proposition}
+For classical propositional logic, the Lindenbaum algebra is
+sufficient. However, our goal is to apply categorical logic to programming
+languages, where the proof theory is not so simple. I mentioned that the
+Lindenbaum algebra \(L(T)\) is the quotient of \(T\) by
+\(\leftrightarrow\). Under the Curry\-/Howard interpretation, this shows that
+the Lindenbaum algebra \(L(T)\) identifies isomorphic types!
+
+For this reason, it will be helpful to take a step backwards and permit
+ourselves to provide our own equational theory. This will require more
+complicatd algebra, but it will build a system which is amenable to the
+Curry\-/Howard correspondence.
+
+\end{document}

@@ -1,0 +1,515 @@
+\documentclass{../thesis-note}
+
+\title{Galois Connections}
+\author{NeuPPL Category Seminar}
+\date{Summer 2024}
+
+\definecolor{NortheasternRed}{RGB}{200,16,46}
+
+\titlecolor{NortheasternRed}
+
+\newcommand\Prop[1]{\text{{\normalfont{Prop}}}{\pwrap{{#1}}}}
+\newcommand\Dwd{\text{\normalfont Dwd}}
+\newcommand\natleq{\mathrel{\stackrel{\text{nat}}{\leq}}}
+\DeclareMathOperator\dset{\downarrow}
+\DeclareMathOperator\Mod{\normalfont Mod}
+\newcommand\Pcal{{\mathcal{P}}}
+
+\usepackage{bussproofs}
+
+\begin{document}
+
+\maketitle%
+
+This time we return to~\cite{Fong2019} to discuss a special kind of relation
+between preorders: \emph{Galois connections}. These are the preorder\-/specific
+forms of an adjunction between categories.
+
+\section{Definition of a Galois connection}
+
+The setting of a Galois connection is a pair of preorders \(\pwrap{X,\leq}\) and
+\(\pwrap{Y,\leq}\). In what follows, I will write \(X\) for the pair
+\(\pwrap{X,\leq}\), etc., using the same symbol for the order\-/relation in any
+preorder.
+\begin{definition}
+  A \textbf{Galois connection} between the preordered sets \(X\) and \(Y\) is a
+  pair of monotone maps \(f: X \to Y\) and \(g: Y \to X\) satisfying the
+  following property. For any pair of elements \(x \in X\) and \(y \in Y\),
+  \[%
+    \begin{array}{rl}
+      f(x) &\leq y \\\hline\hline
+      x &\leq g(y).
+    \end{array}
+  \]%
+  In this case \(f\) is called the \textbf{left adjoint}, and \(g\) is called
+  the \textbf{right adjoint}. We express the relationship between \(f\) and
+  \(g\) by writing \(f \dashv g\).
+\end{definition}
+One powerful property of Galois connections (and adjunctions, more generally) is
+there preservation of limits and colimits.
+\begin{proposition}\label{prop:adjoints-preserve-limits}
+  Let \(f: X \to Y\) and \(g: Y \to X\) form a Galois connection \(f \dashv g\)
+  between preordered sets \(X\) and \(Y\). Then \(f\) preserves all colimits (i.e.,
+  suprema), and \(g\) preserves all limits (i.e., infima).
+\end{proposition}
+\begin{remark}
+  A functor which preserves colimits is sometimes called a \emph{right\-/exact
+    functor}, and a functor which preserves limits is sometimes called a
+  \emph{left\-/exact functor}. Therefore the above proposition can be restated
+  more mnemonically as: \emph{if a functor has a right adjoint, then it
+    is right exact, and if it has a left adjoint, then it is left exact.} 
+\end{remark}
+\begin{proof}[Proof of Proposition~\ref{prop:adjoints-preserve-limits}]
+  We will show that \(f\) preserves suprema. The proof that \(g\) preserves
+  infima is formally dual. Consider a diagram \(J : D \to
+  X\). Assuming the colimit along \(J\) exists, we need to show
+  \[%
+    f\pwrap{ \bigvee_{i \in D} J(i) } \cong \bigvee_{i \in D} f(J(i)).
+  \]%
+  To that end, let \(x\) be an element in \(X\) representing \(\bigvee_{i \in D}
+  J(i)\). We will show that \(f(x)\) is the least upper bound of the set
+  \(\bwrap{ f(J(i)) \mid i \in D }\). Since \(J(i) \leq x\) for any \(i \in D\),
+  \(f(J(i)) \leq f(x)\) since \(f\) is order\-/preserving. Therefore \(f(x)\) is
+  an upper bound. On the other hand, suppose \(y \in Y\) is an element
+  satisfying \(f(J(i)) \leq y\) for any \(i \in D\). Since \(f\) is left adjoint
+  to \(g\), this implies \(J(i) \leq g(y)\) for any \(i \in D\). Since \(x\) is
+  a least upper bound of \(\bwrap{J(i) \mid i \in D}\), \(x \leq g(y)\). We use
+  the Galois connection again to deduce from this that \(f(x) \leq
+  y\). Therefore \(f(x)\) is a least upper bound, as desired.
+\end{proof}
+We now apply the fundamental trick in category theory: use
+\(\texttt{refl}\). Every preorder is reflexive, so \(f(x) \leq f(x)\), for any
+\(x \in X\). By the above property of Galois connections
+\[%
+  \begin{array}{rl}
+    f(x) &\leq f(x) \\\hline
+    x &\leq g(f(x)).
+  \end{array}
+\]%
+Similarly, \(g(y) \leq g(y)\), so the Galois connection implies
+\[%
+  \begin{array}{rl}
+    g(y) &\leq g(y) \\\hline
+    f(g(y)) &\leq y.
+  \end{array}
+\]%
+In fact, these properties characterize a Galois connection.
+\begin{theorem}\label{thm:galois-connection-closure}
+  Let \(f: X \to Y\) and \(g: Y \to X\) be a pair of order\-/preserving
+  maps. \(f\) and \(g\) form a Galois connection \(f \dashv g\) if and only if,
+  for any \(x \in X\) and \(y \in Y\),
+  \[%
+    x \leq g(f(x)) \text{ and } f(g(y)) \leq y.
+  \]%
+\end{theorem}
+\begin{warning_box*}
+  The conditions \(x \leq g(f(x))\) and \(f(g(y)) \leq y\) for any \(x \in X\)
+  and \(y \in Y\) show that \(g \circ f\) is a \emph{closure operator} and \(f
+  \circ g\) is an \emph{interior operator} (this is the terminology used in the
+  warm\-/up). This is the preorder\-/variant of a more general property of
+  adjunctions. Given any adjunction \(F \dashv G\) between categories, \(GF\) is
+  a monad, and \(FG\) is a comonad.
+\end{warning_box*}
+\begin{proof}[Proof of Theorem~\ref{thm:galois-connection-closure}]
+  The forward direction was proven in the above discussion. For the reverse
+  direction, assume, for any \(x \in X\) and \(y \in Y\), \(x \leq g(f(x))\) and
+  \(f(g(y)) \leq y\). We need to show that \(f\) and \(g\) form a Galois
+  connection \(f \dashv g\). Consider a pair of elements \(x \in X\) and \(y \in
+  Y\). We have a chain of implications.
+  \begin{prooftree}
+    \AxiomC{$x \leq g(f(x))$}
+    \AxiomC{$f(x) \leq y$}
+    \RightLabel{$g$ order\-/pres.}
+    \UnaryInfC{$g(f(x)) \leq g(y)$}
+    \RightLabel{$g\circ f$ closure operator.}
+    \BinaryInfC{$x \leq g(y)$}
+  \end{prooftree}
+  Therefore \(f(x) \leq y\) implies \(x \leq g(y)\). Conversely, we have a
+  similar chain of implications.
+  \begin{prooftree}
+    \AxiomC{$x \leq g(y)$}
+    \LeftLabel{$f$ order\-/pres.}
+    \UnaryInfC{$f(x) \leq f(g(y))$}
+    \AxiomC{$f(g(y)) \leq y$}
+    \LeftLabel{$f\circ g$ interior operator.}
+    \BinaryInfC{$f(x) \leq y$}
+  \end{prooftree}
+  Thus \(x \leq g(y)\) implies \(f(x) \leq y\). Since \(x\) and \(y\) are
+  arbitrary, this shows that \(f\) and \(g\) form a Galois connection \(f \dashv
+  g\), as desired.
+\end{proof}
+\begin{example}
+  During the seminar on Galois connections, Steven brought up a nice example
+  for finding a Galois connection. Here is the example. It will motivate a
+  theorem characterizing the existence of Galois connections. Consider the
+  following preorders
+  \[%
+    \begin{tikzcd}
+      X \eqdef & \bullet \arrow[r] & \bullet \arrow[r] & \bullet \arrow[r] & \bullet\\
+      Y \eqdef & \bullet \arrow[r] & \bullet \arrow[r] & \bullet
+    \end{tikzcd}
+  \]%
+  Given a functor \(g : Y \to X\), e.g.,
+  \[%
+    \begin{tikzcd}
+      \bullet \arrow[r] & \bullet \arrow[r] & \bullet \arrow[r] & \bullet\\
+      \bullet \arrow[u,bend right=10] \arrow[r] & \bullet \arrow[ur, bend
+      right=10] \arrow[r] & \bullet
+      \arrow[u, bend right=10]
+    \end{tikzcd}
+  \]%
+  we can ask whether this functor has a left adjoint \(f: X \to Y\) (forming a
+  Galois connection \(f \dashv g\). In this example, no left adjoint exists. We
+  can see this by looking at what \(f\) must do to the right-most point of
+  \(X\). Recall, for any Galois connection \(f \dashv g\) and any \(x \in X\),
+  \(x \leq g(f(x))\). There is no choice for \(f(x)\) to satisfy this
+  constraint, since the image of \(g\) is strictly less than the right-most
+  point.
+
+  On the other hand, we can ask if \(g : Y \to X\) has a \emph{right} adjoint
+  \(h : X \to Y\) (forming a Galois connection \(g \dashv h\). We can construct
+  \(h\) by looking at the behavior of \(g \circ h\) starting from the
+  left. Recall, for a Galois connection \(g \dashv h\) and any element
+  \(x \in X\), \(g(h(x)) \leq x\). For the left most point of \(X\), there is
+  only one choice of \(h(x)\) which satisfies this constraint, shown below.
+  \[%
+    \begin{tikzcd}
+      \bullet \arrow[r] \arrow[d,bend right=15, dashed] & \bullet \arrow[r] &
+      \bullet \arrow[r] & \bullet\\
+      \bullet \arrow[u,bend right=10] \arrow[r] & \bullet \arrow[ur, bend
+      right=10] \arrow[r] & \bullet \arrow[u, bend right=10]
+    \end{tikzcd}
+  \]%
+  Similarly, the image of the second point under \(h\) is fixed by this
+  constraint.
+  \[%
+    \begin{tikzcd}
+      \bullet \arrow[r] \arrow[d,bend right=15, dashed] & \bullet \arrow[r]
+      \arrow[dl,bend right=10, dashed] & \bullet \arrow[r] & \bullet\\
+      \bullet \arrow[u,bend right=10] \arrow[r] & \bullet \arrow[ur, bend
+      right=10] \arrow[r] & \bullet \arrow[u, bend right=10]
+    \end{tikzcd}
+  \]%
+  For the third point, any choice of image satisfies this constraint.
+  \[%
+    \begin{tikzcd}
+      \bullet \arrow[r] \arrow[d,bend right=15, dashed] & \bullet \arrow[r]
+      \arrow[dl,bend right=10, dashed] & \bullet \arrow[r] \arrow[dl,dashed,bend
+      right=10, red] \arrow[dll,dashed,bend right=10, red] \arrow[d,dashed,bend
+      right=15, red] & \bullet\\
+      \bullet \arrow[u,bend right=10] \arrow[r] & \bullet \arrow[ur, bend
+      right=10] \arrow[r] & \bullet \arrow[u, bend right=10]
+    \end{tikzcd}
+  \]%
+  To determine which choice is the correct choice, we need to use another
+  constraint. In the reverse direction, for any \(y \in Y\), \(y \leq
+  h(g(y))\). When \(y\) is the right\-/most point of \(Y\), this fixes the
+  choice of red arrow.
+  \[%
+    \begin{tikzcd}
+      \bullet \arrow[r] \arrow[d,bend right=15, dashed] & \bullet \arrow[r]
+      \arrow[dl,bend right=10, dashed] & \bullet \arrow[r] \arrow[d,dashed,bend
+      right=15, red] & \bullet\\
+      \bullet \arrow[u,bend right=10] \arrow[r] & \bullet \arrow[ur, bend
+      right=10] \arrow[r] & \bullet \arrow[u, bend right=10]
+    \end{tikzcd}
+  \]%
+  This leaves the right-most point of \(X\). \(h: X \to Y\) must be
+  order\-/preserving. This fixes the choice for the image of the right\-/most
+  point.
+  \[%
+    \begin{tikzcd}
+      \bullet \arrow[r] \arrow[d,bend right=15, dashed] & \bullet \arrow[r]
+      \arrow[dl,bend right=10, dashed] & \bullet \arrow[r] \arrow[d,dashed,bend
+      right=15] & \bullet \arrow[dl,dashed,bend right=10, red]\\
+      \bullet \arrow[u,bend right=10] \arrow[r] & \bullet \arrow[ur, bend
+      right=10] \arrow[r] & \bullet \arrow[u, bend right=10]
+    \end{tikzcd}
+  \]%
+  Thus, we have found the right adjoint \(h\) using the constraints \(g(h(x))
+  \leq x\) and \(y \leq h(g(y))\).
+\end{example}
+The previous example suggests the question of uniqueness of an adjoint. Adjoints
+are always unique, up to isomorphism. We will prove this by writing right
+adjoints as colimits (and left adjoints as a limit).
+\begin{theorem}\label{thm:right-adjoint-pointwise}
+  Let \(f: X \to Y\) be an order\-/preserving map between preorders. If \(f\)
+  has a right adjoint \(g: Y \to X\), then \(g\) satisfies
+  \[%
+    g(y) \cong \bigvee_{x \in f^{-1}(\dset y)} x.
+  \]
+\end{theorem}
+\begin{warning_box*}
+  This supremum is the preorder variant of the following colimit, which
+  characterizes a right adjoint of a functor \(F: C \to D\).
+  \[%
+    G(y) \cong \varinjlim\pwrap{ F \downarrow y \to C },
+  \]%
+  where \(F \downarrow y\) is the \emph{comma category} of \(F\) and \(y\). Its
+  objects are pairs \(\pwrap{x, a: F(x) \to y}\) of an object \(x\) of \(C\) and
+  an arrow \(a : F(x) \to y\) in \(D\). An arrow \(\pwrap{x,a} \to
+  \pwrap{x',a'}\) is an arrow \(\theta: x \to x'\) in \(C\) fitting into a
+  commuting triangle
+  \[%
+    \begin{tikzcd}
+      F(x) \arrow[rr,"F(\theta)"] \arrow[dr,"a",bend right=10] & & F(x')
+      \arrow[dl,"a'", bend left=10, swap] \\
+      & y. &
+    \end{tikzcd}
+  \]%
+  The functor \(F \downarrow y \to C\) sends a commuting triangle likke the one
+  above to the arrow \(\theta : x \to x'\).
+\end{warning_box*}
+\begin{proof}[Proof of Theorem~\ref{thm:right-adjoint-pointwise}]
+  We first show that \(g(y)\) is an upper bound for \(f^{-1}(\dset y)\). Then we
+  will show that \(g(y)\) is the least upper bound. Any element
+  \(x \in f^{-1}(\dset y)\) satisfies \(f(x) \leq y\) by definition of
+  \(\dset y\). Since \(g\) is a right adjoint, this implies \(x \leq g(y)\), so
+  \(g(y)\) is an upper bound. Furthermore, any Galois connection \(f \dashv g\)
+  satisfies
+  \[%
+    f(g(y)) \leq y,
+  \]%
+  for any \(y \in Y\). Thus \(g(y) \in f^{-1}(\dset y)\), so \(g(y)\) is a least
+  upper bound, as desired. (In fact, this shows that \(g(y)\) is the maximum of
+  \(f^{-1}(\dset y)\) rather than just the supremum.)
+\end{proof}
+\begin{corollary}
+  Let \(f: X \to Y\) be an order\-/preserving map between preorders. Suppose
+  \(g_1 : Y \to X\) and \(g_2: Y \to X\) are right adjoints to \(f\), i.e.,
+  there are Galois connections \(f \dashv g_1\) and \(f \dashv g_2\). Then
+  \(g_1\) and \(g_2\) are \textbf{naturally isomorphic}: for any element \(y \in
+  Y\),
+  \[%
+    g_1(y) \leq g_2(y) \text{ and } g_2(y) \leq g_1(y).
+  \]%
+\end{corollary}
+\begin{proof}
+  By Theorem~\ref{thm:right-adjoint-pointwise}, the two Galois connections \(f
+  \dashv g_1\) and \(f \dashv g_2\) imply, for any \(y \in Y\)
+  \[%
+    g_1(y) \cong \bigvee_{x \in f^{-1}(\dset y)} x \cong g_2(y).
+  \]%
+  Thus \(g_1(y) \cong g_2(y)\). Recall this means \(g_1(y) \leq g_2(y)\) and
+  \(g_2(y) \leq g_1(y)\), as desired.
+\end{proof}
+We can prove the analogous things for left adjoints too.
+\begin{warning_box*}
+  \begin{exercise}
+    Let \(g: Y \to X\) be an order\-/preserving map between preorders. Suppose
+    \(f: X \to Y\) is a \emph{left} adjoint to \(g\). Show, for any \(x \in X\),
+    \[%
+      f(x) \cong \bigwedge_{y \in g^{-1}(\uparrow x)} y.
+    \]%
+    Where \(\uparrow x\) is the set of elements \(x'\) in \(X\) such that \(x \leq
+    x'\). This is the preorder form of the limit
+    \[%
+      f(x) \cong \varprojlim{x \downarrow g \to Y}.
+    \]%
+    Furthermore, show that left adjoints are unique up to natural isomorphism.
+    
+    This exercise can be proven directly, using the same argument. Alternatively,
+    use Theorem~\ref{thm:right-adjoint-pointwise} on the opposite preorders
+    \(\pwrap{X,\geq}\) and \(\pwrap{Y,\geq}\).
+  \end{exercise}
+\end{warning_box*}
+
+\section{A very important Galois connection}
+
+Let \(X\) and \(Y\) be a pair of sets, and let \(f: X \to Y\) be a function
+between them. From \(f\) we can define an order\-/preserving map
+\(f^{-1} : \Pcal(Y) \to \Pcal(X)\) which sends a subset \(A \in \Pcal(Y)\) to
+its preimage
+\[%
+  f^{-1}(A) \eqdef \bwrap{ x \in X \mid f(x) \in A } \in \Pcal(X).
+\]%
+This order\-/preserving map participates in two Galois connections. These Galois
+connections are essential for interpreting first\-/order logic inside a
+topos. First, \(f^{-1}\) has a left adjoint, written
+\(\exists_f : \Pcal(X) \to \Pcal(Y)\). This is the usual image map:
+\[%
+  \exists_f \pwrap{B \in \Pcal(X)} \eqdef f(B) = \bwrap{ y \in Y \mid \exists x
+    \in X. f(x) = y \wedge x \in B }.
+\]%
+\begin{proposition}
+  \(\exists_f\) is the left adjoint of \(f^{-1}\) (forming a Galois connection
+  \(\exists_f \dashv f^{-1}\)).
+\end{proposition}
+\begin{proof}
+  Let \(A \in \Pcal(Y)\) and \(B \in \Pcal(X)\). Then \(B \subseteq f^{-1}(A)\)
+  if and only if every element \(x \in B\) satisfies \(f(x) \in A\), which is
+  true if and only if \(f(B) \subseteq A\), i.e., \(\exists_f B \subseteq A\).
+\end{proof}
+\(f^{-1}\) also has a right adjoint \(\forall_f : \Pcal(X) \to \Pcal(Y)\). This
+is sometimes called the \emph{dual image} (c.f.\linebreak\cite{Makkai1977}). The
+dual image is defined using the universal quantifier:
+\[%
+  \forall_f \pwrap{B \in \Pcal(X)} \eqdef \bwrap{%
+    y \in Y \mid \forall x \in X. f(x) = y \Rightarrow x \in B
+  } = \bwrap{%
+    y \in Y \mid f^{-1}(\bwrap{y}) \subseteq B
+  }.%
+\]%
+\begin{proposition}
+  \(\forall_f\) is a right adjoint for \(f^{-1}\), yielding a Galois connection
+  \(f^{-1} \dashv \forall_f\).
+\end{proposition}
+\begin{proof}
+  Let \(A \in \Pcal(Y)\) and \(B \in \Pcal(X)\) be a pair of subsets. Suppose
+  \(f^{-1}(A) \subseteq B\). Then for any element \(y \in A\),
+  \(f^{-1}(\bwrap{y}) \subseteq B\) (since \(f^{-1}\) is order\-/preserving),
+  i.e., \(y \in \forall_f A\). Since \(y\) is arbitrary, this shows that \(A
+  \subseteq \forall_f B\). Conversely, suppose \(A \subseteq \forall_f B\), then
+  for any \(y \in A\), \(f^{-1}(\bwrap{y}) \subseteq B\). Thus
+  \[%
+    f^{-1}(A) = \bigcup_{y \in A} f^{-1}(\bwrap{y}) \subseteq B,
+  \]%
+  as desired.
+\end{proof}
+The previous two propositions show that we have an \emph{adjoint triple}
+\(\exists_f \dashv f^{-1} \dashv \forall_f\). Adjoint triples are particularly
+nice categorical structures. Longer adjoint \emph{strings}, e.g., \(f_1 \dashv
+\ldots \dashv f_n\) are rarer and have increasingly powerful properties. For
+example, we have a fun fact.
+\begin{proposition}[\cite{Rosebrugh1994}]
+  Let \(C\) be a locally small category, and let \(\Yo : C \to \text{Psh}(C)\)
+  be its Yoneda embedding. If \(\Yo\) extends to the left to an adjoint
+  quintuple
+  \[%
+    F_1 \dashv F_2 \dashv F_3 \dashv F_4 \dashv \Yo,
+  \]%
+  then \(C\) is equivalent to the category \(\Set\).
+\end{proposition}
+The adjoint triple \(\exists_f \dashv f^{-1} \dashv \forall_f\) gives an
+overpowered proof of the following result.
+\begin{corollary}
+  \(f^{-1} : \Pcal(Y) \to \Pcal(X)\) preserves intersections and unions.
+\end{corollary}
+\begin{proof}
+  \(f^{-1}\) has both a left and a right adjoint. Therefore, by
+  Proposition~\ref{prop:adjoints-preserve-limits}, \(f^{-1}\) preserves infima
+  and suprema, i.e., intersections and unions.
+\end{proof}
+
+\subsection*{Quantifiers as Adjoints}
+
+The notation in the adjoint triple \(\exists_f \dashv f^{-1} \dashv \forall_f\)
+suggests the adjoints to \(f^{-1}\) have something to say about the quantifiers
+in first\-/order predicate logic. If we are working within a topos, there is a
+bijection between subsets \(A \subseteq X\) and propositions \(\chi_A(x : X)\)
+with a free variable representing an element of \(X\). This bijection is given
+by
+\[%
+  \phi(x : X) \mapsto \bwrap{x \in X \mid \phi(x)} \subseteq X.
+\]%
+(This bijection exists because a topos has a \emph{subobject classifier}.) Under
+this bijection, the above adjoint triple interprets the quantifiers \(\exists\)
+and \(\forall\) in the way we expect. We can also describe essentially the same
+adjoint triple directly in logic.
+
+Recall, from a propositional theory \(T\), we can form its Lindenbaum algebra
+\(L(T)\) of propositions. To describe a first\-/order theory, we stitch together
+families of Lindenbaum algebras, indexed by a context of free variables.
+\begin{definition}
+  A \textbf{first\-/order signature} \(\Sigma\) is a collection of the following
+  data.
+  \begin{itemize}
+  \item A set of \emph{sorts} \(\sigma \in \Sigma\).
+  \item A collection of base terms, i.e., \emph{function symbols}
+    \[%
+      x_1 : \sigma_1, \ldots, x_n : \sigma_n \vdash f(x_1,\ldots,x_n) : \tau.
+    \]%
+  \item For every context \(x_1: \sigma_1,\ldots,x_n : \sigma_n\), a collection
+    of base propositions. e.g., \(R(x_1 : \sigma_1,\ldots, x_n : \sigma_n)\).
+  \end{itemize}
+  A \textbf{first\-/order theory} is a first\-/order signature and a set of
+  sequents, which are the axioms of the theory.
+\end{definition}
+If we fix a context, we can use the usual connectives \(\wedge,\vee,\) etc.\ to
+form formulae. The new expressivity comes from the terms in a first\-/order
+signature. We can freely compose terms in the usual typed manner. Given a list
+of terms \(\Gamma \vdash t_1 : \tau_1, \ldots, \Gamma \vdash t_n : \tau_n\),
+which we could write as an arrow \(t: \Gamma \to \Gamma'\), where \(\Gamma'\) is
+a context of fresh variables of type \(\tau_1,\ldots,\tau_n\), we obtain a map
+\[%
+  t^* : \text{Form}(\Gamma') \to \text{Form}(\Gamma)
+\]%
+given by substitution. If \(\phi( \vec{x} : \Gamma' )\) is a formula with
+context \(\Gamma'\), then substituting the list of terms \(t\) gives a formula
+\(\phi(t_1,\ldots,t_n)\) with context \(\Gamma\). The left and right adjoints to
+\(t^*\) allow us to interpret quantifiers: \(\exists_t \dashv t^* \dashv
+\forall_t\), where the preorder on \(\text{Form}(\Gamma)\) is given by
+provability \(\vdash\), the same as in the Lindenbaum algebra. We bundle this
+data into one categorical structure.
+\begin{definition}
+  A \textbf{first\-/order hyperdoctrine} is a pair \(\pwrap{C,F}\) of a category
+  \(C\) of contexts and terms and a functor
+  \[%
+    F : C^\op \to \text{Lindenbaum Algebras}
+  \]%
+  sending a context \(\Gamma\) to its Lindenbaum algebra of formulae with free
+  variables in \(\Gamma\). We require, for any arrow \(t : \Gamma \to \Gamma'\)
+  in \(C\), we have an adjoint triple
+  \[%
+    \exists_t \dashv F(t) \dashv \forall_t.
+  \]%
+\end{definition}
+Any first\-/order theory defines a first\-/order hyperdoctrine, where \(F(t) =
+t^*\). The adjoints \(\exists_t\) and \(\forall_t\) are given by
+\[%
+  \exists_t \phi( \vec{x'} : \Gamma' ) \equiv \exists \vec{x} : \Gamma
+  .\, t(\vec{x}) = \vec{x'} \wedge \phi(\vec{x}).
+\]%
+and
+\[%
+  \forall_t \phi(\vec{x'} : \Gamma' ) \equiv \forall \vec{x} : \Gamma.\,
+  t(\vec{x}) = \vec{x'} \Rightarrow \phi(\vec{x}).
+\]%
+\begin{theorem}[Quantifiers are adjoints]
+  Given a pair of context \(\Gamma\) and \(\Gamma'\), a list of terms \(t :
+  \Gamma \to \Gamma'\), and a pair of formulae \(\phi( \vec{x} : \Gamma )\) and
+  \(\psi(\vec{x'} : \Gamma')\),
+  \[%
+    \phi(\vec{x}) \vdash t^* \psi(\vec{x}) \text{ if and only if } \exists_t
+    \phi(\vec{x'}) \vdash \psi(\vec{x'}).
+  \]%
+  Similarly
+  \[%
+    t^* \psi(\vec{x}) \vdash \phi(\vec{x}) \text{ if and only if } \forall_t
+    \phi(\vec{x'}) \vdash \psi(\vec{x'}).
+  \]%
+  In other words, we have a pair of Galois connections \(\exists_t \dashv t^*\)
+  and \(t^* \dashv \forall_t\).
+\end{theorem}
+
+We now give an example of a term and its adjoint triple. Given a pair of
+variables \(x_1 : \sigma_1, x_2 : \sigma_2\), we can form the ``projection''
+\[%
+  x_1 : \sigma_1, x_2: \sigma_2 \vdash x_1 : \sigma_1,
+\]%
+representing an arrow \(\pi_1 : \sigma_1,\sigma_2 \to \sigma_1\). Let
+\(\phi(x_1,x_2\) and \(\psi(x_1\) be a pair of formulae with context
+\(\sigma_1,\sigma_2\) and \(\sigma_1\), respectively. Note, given another pair
+of variables \(y_1 : \sigma_1, y_2 : \sigma_2\), then
+\[%
+  \pi_1^* \psi(y_1,y_2) \equiv \psi(\pi_1(y_1,y_2)) \equiv \psi(y_1),
+\]%
+Similarly,
+\[%
+  \exists_{\pi_1} \phi(x_1) \equiv \exists x_1' : \sigma_1.\, \exists x_2' :
+  \sigma_2 .\, \pi_1(x_1',x_2') = x_1 \wedge \phi(x_1',x_2') \equiv \exists x_1'
+  \exists x_2' \, x_1' = x_1 \wedge \phi(x_1',x_2').
+\]%
+The latter is provably equivalent (by \(=\) elimination) to \(\exists x_2'
+.\, \phi(x_1, x_2')\). To emphasize, we have shown:
+\[%
+  \exists_{\pi_1} \phi(x_1) \dashv \vdash \exists x_2' .\, \phi(x_1,x_2').
+\]%
+A similar argument shows \(\forall_{\pi_1} \phi(x_1) \dashv\vdash \forall x_2'
+.\, \phi(x_1,x_2')\). In other words, the adjoints \(\exists_\pi\) and
+\(\forall_\pi\) recover the usual quantifiers when \(\pi\) is a projection.
+
+\bibliographystyle{apalike}
+\bibliography{../refs}
+
+\end{document}

@@ -1,0 +1,142 @@
+\documentclass{../thesis-note}
+
+\title{Categories Warm-Up}
+\author{NeuPPL Category Seminar}
+\date{28 June 2024}
+
+\definecolor{NortheasternRed}{RGB}{200,16,46}
+
+\titlecolor{NortheasternRed}
+
+\newcommand\natsubseteq{{\stackrel{\text{nat}}{\leq}}}
+
+\begin{document}
+
+\maketitle%
+
+\section*{Preorders as Categories}
+
+Let \(X\) be a set. A \textbf{preorder} on \(X\) is a reflexive and transitive
+relation \(\_\leq\_ \subseteq X \times X\). For example, any partial order is a
+preorder (but not all preorders are partial orders!). We will show that
+preordered sets form a special class of categories.
+
+\begin{exercise}
+  Let \(\pwrap{X,\leq}\) be a preordered set. Define a category
+  \(\Cl\pwrap{X,\leq}\) in the following manner.
+  \begin{itemize}
+  \item The objects of \(\Cl\pwrap{X,\leq}\) are the elements of \(X\).
+  \item There is precisely one arrow \(x \to y\) in \(\Cl\pwrap{X,\leq}\) in the
+    case that \(x \leq y\).
+  \end{itemize}
+  Verify that \(\Cl\pwrap{X,\leq}\) is a category. Can any of the hypotheses on
+  the relation \(\leq\) be relaxed while still ensuring that
+  \(\Cl\pwrap{X,\leq}\) is a category?
+
+  The category \(\Cl\pwrap{X,\leq}\) is called the \textbf{classifying category}
+  of the preorder \(\pwrap{X,\leq}\).
+\end{exercise}
+
+\begin{exercise}
+  \begin{itemize}
+  \item Unpack what it means for two objects \(x,y\) of \(\Cl\pwrap{X,\leq}\) to
+    be isomorphic, in terms of the preordered set \(\pwrap{X,\leq}\).
+  \item Unpack what is a functor \(\Cl\pwrap{X,\leq} \to \Cl\pwrap{Y,\leq}\), in
+    terms of a function between preordered sets \(\pwrap{X,\leq} \to
+    \pwrap{Y,\leq}\).
+  \item The opposite category \(\Cl\pwrap{X,\leq}^\op\) is the classifying
+    category of another preordered set \(\pwrap{X',\leq}\). What is this
+    preordered set?
+  \end{itemize}
+\end{exercise}
+
+\begin{exercise}
+  Let \(\Omega \eqdef \bwrap{\False, \True}\) with the usual preordering
+  \(\False \leq \True\). To keep things clean, let's also write \(\Omega\) for
+  \(\Cl\pwrap{\Omega,\leq}\). Given an object \(x\) of \(\Cl\pwrap{X,\leq}\), we
+  can write a functor \(\downarrow x : \Cl\pwrap{X,\leq}^\op \to \Omega)\):
+  \[%
+    \downarrow x (y) \eqdef
+    \begin{cases}
+      \True & \text{if \(y \leq x\)} \\
+      \False & \text{otherwise}.
+    \end{cases}
+  \]%
+  Write \(\downarrow x \stackrel{\text{nat}}{\leq} \downarrow y\) in the
+  case that, for any object \(z\) of \(\Cl\pwrap{X,\leq}\),
+  \(\downarrow x(z) \leq \downarrow y(z)\). Show for any pair of elements
+  \(x,y \in X\),
+  \[%
+    x \leq y \text{ if and only if } \downarrow x
+    \stackrel{\text{nat}}{\leq} \downarrow y.
+  \]%
+\end{exercise}
+
+\section*{Monads for Preorders (Extra)}
+
+Given two categories \(C,D\) and a functor \(F: C \to D\), a \textbf{right
+  adjoint} to \(F\) is a functor \(G : D \to C\) satisfying the following
+universal property.
+\[%
+  \begin{array}{c}
+    f : F X \to Y \\ \hline\hline
+    f^\dagger : X \to G Y.
+  \end{array}
+\]%
+We read this as: \emph{for any construction of an arrow from \(F X\) to \(Y\) in
+  \(D\), there exists a unique dual construction of an arrow form \(X\) to \(G
+  Y\) in \(C\).}
+In the case where \(C\) and \(D\) are the classifying categories of preordered
+sets, \(C = \Cl\pwrap{X,\leq}\) and \(D = \Cl\pwrap{Y,\leq}\), then there is
+only one way to make an arrow from \(FX\) to \(Y\) and from \(X\) to
+\(GY\). Then the above universal property reduces to
+\[%
+  \begin{array}{c}
+    FX \leq Y\\ \hline\hline
+    X \leq GY
+  \end{array}
+\]%
+This pair \(F \dashv G\) is called a \textbf{Galois connection}.
+
+\begin{exercise}
+  Given a Galois connection \(F \dashv G\), where \(F : \Cl\pwrap{X,\leq} \to
+  \Cl\pwrap{Y,\leq}\) and \(G: \Cl\pwrap{Y,\leq} \to \Cl\pwrap{X,\leq}\), we can
+  apply \(G\) after \(F\) to obtain a ``loop'':
+  \[%
+    G F : \Cl\pwrap{X,\leq} \to \Cl\pwrap{X,\leq}.
+  \]%
+  Show that \(GF\) is a \textbf{closure operator}, i.e., for any object \(x\) of
+  \(\Cl\pwrap{X,\leq}\), \(x \leq GF x\) and \(GF \pwrap{ GF x } \leq GF x\).
+\end{exercise}
+
+\begin{exercise}
+  We can reverse the previous exercise. Apply \(F\) after \(G\) to obtain
+  another ``loop'':
+  \[%
+    FG : \Cl\pwrap{Y,\leq} \to \Cl\pwrap{Y,\leq}.
+  \]%
+  Show that \(FG\) is an \textbf{interior operator}, i.e., for any object \(y\)
+  of \(\Cl\pwrap{Y,\leq}\), \(FG y \leq y\) and \(FG y \leq FG \pwrap{FG y}\).
+\end{exercise}
+
+  Here is an example of a closure operator which will appear in different forms
+later. Let \(\pwrap{X,\leq}\) be a preorder, as before. We saw in
+Exercise~\ref{ex:3} that we can ``embed'' the elements of \(X\) into maps
+\(\Cl\pwrap{X,\leq}^\op \to \Omega\). In fact, we can make the set of all such
+maps into a preorder using \(\stackrel{\text{nat}}{\leq}\). Given a pair of maps
+\(F,F' : \Cl\pwrap{X,\leq}^\op \to \Omega\), write \(F
+\stackrel{\text{nat}}{\leq} F'\) in the case that, for any element \(x \in X\),
+we have
+\[%
+  F x \leq F x '.
+\]%
+A \textbf{Lawvere-Tierney topology} on \(\pwrap{X,\leq}\) is a closure
+operator \(J\) on the set of maps \(\Cl\pwrap{X,\leq}^\op \to \Omega\)
+satisfying:
+\begin{itemize}
+\item \(J\) is \textbf{idempotent}: \(J(J F) \natsubseteq J (F)\) (and \(J(F)
+  \natsubseteq J(J(F))\).
+\item \(J\) preserves infima.
+\end{itemize}
+
+\end{document}
