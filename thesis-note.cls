@@ -1,7 +1,6 @@
 \NeedsTeXFormat{LaTeX2e}
 % Originally based on my homework-math class.
-\ProvidesClass{thesis-note}[2024/8/7 Personal thesis note class, modified for
-NeuPPL]
+\ProvidesClass{thesis-note}[2024/8/7 Personal thesis note class, modified for NeuPPL]
 
 %%% DEFAULTS %%%
 \def\@true{1}
