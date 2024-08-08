@@ -1,0 +1,2 @@
+((nil . ((TeX-output-dir . "."))
+      ))
