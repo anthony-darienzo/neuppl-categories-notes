@@ -127,9 +127,13 @@ connections.
 
 \section{Indexed sets}
 
-We begin by describing a presheaf as an indexed set. By indexed set, we mean
-indexed in the following manner. Given a family of sets \(\bwrap{ X_\alpha \mid
-  \alpha \in I }\), we can describe this family with a function
+We begin by describing a presheaf as an indexed set. This is backwards from the
+usual order of presentation in a category theory textbook. My goal with starting
+with indexed sets is to demonstrate the resemblance between the theory of
+presheaves and the theory of sets. This will be done by showing that presheaves
+\emph{are} indexed sets. By indexed set, we mean indexed in the following
+manner. Given a family of sets \(\bwrap{ X_\alpha \mid \alpha \in I }\), we can
+describe this family with a function
 \[%
   \pi : X \to I,
 \]%
@@ -283,7 +287,7 @@ Given an arrow \(f: X \to Y\) in \(C\), we obtain an indexed function \(f_* :
 \[%
   f_*\pwrap{g : Z \to X} \eqdef f \circ g : Z \to Y.
 \]%
-\begin{lemma}[\(C\)\-/indexed Yoneda lemma]
+\begin{lemma}[\(C\)\-/indexed Yoneda lemma]\label{lemma:yoneda-indexed-sets}
   The mapping \(X \mapsto \dset X\) and \(f \mapsto f_*\) defines a functor
   \[%
     \dset : C \to \iSet{C}.
@@ -424,7 +428,7 @@ algebra, but the Heyting implication \(\Rightarrow\) is subtle. The above
 pattern suggests we might try
 \(\abs{A \Rightarrow B} \stackrel{?}{=} \abs{A} \Rightarrow \abs{B}\).  The
 issue is the right side is not closed under multiplication. Here is an example.
-\begin{warning_box*}
+\begin{tcolorbox}[colframe=NortheasternRed, breakable, enhanced jigsaw]
   \begin{example}
     Let \(C = \Cl\pwrap{\N,\leq}\). Here is a picture of \(C\).
     \[%
@@ -484,7 +488,7 @@ issue is the right side is not closed under multiplication. Here is an example.
     the \(\Set\)\-/based Heyting implication is not the correct choice for a
     Heyting implication on indexed subsets!
   \end{example}
-\end{warning_box*}
+\end{tcolorbox}
 The above example shows that, in order to define \(\Rightarrow\) among indexed
 subsets, we need to force \(\abs{A \Rightarrow B}\) to be closed under
 multiplication. The solution? \emph{force} it to be closed under multiplication.
@@ -646,6 +650,127 @@ Thankfully quotients are simpler.
   \textbf{quotient} indexed set \(X/R\) has underlying set \(\abs{X} /
   \abs{R}\). The projection and multiplication is inherited from \(X\).
 \end{definition}
+
+\begin{remark}
+  The discussion on Heyting implication and exponentials is loosely inspired by
+  Chapter I of\linebreak\cite{MacLane1994}.
+\end{remark}  
+
+\subsection*{From indexed sets to limits}
+
+We have an embedding \(\dset : C \to \iSet{C}\). This allows us to describe
+objects of \(C\) using indexed set theory.
+\begin{definition}
+  Let \(C\) be a small category. Let \(X\) be an indexed set. \(A\) is
+  \textbf{representable} if there exists an object \(X \in C^{(0)}\) and an
+  indexed bijection \(\dset X \cong A\).
+\end{definition}
+This notion of representability is what we use to describe limits in \(C\).
+\begin{definition}
+  Let \(X,Y\) be objects of \(C\). A \textbf{product} of \(X\) and \(Y\) is an
+  object \(Z\) and an indexed bijection
+  \[%
+    \dset Z \cong \dset X \times \dset Y.
+  \]%
+\end{definition}
+We can unpack what this means in terms of arrows. It will help to give the above
+bijection a name. Let \(\brak{\_,\_} : \dset X \times \dset Y \to \dset Z\)
+denote the inverse of the above bijection. Given an ordered pair \(\pwrap{f,g}
+\in \dset X \times \dset Y\), we know \(\pi(f) = \pi(g)\), let \(W\) be this
+common object: \(W \eqdef \pi(f)\). Then \(f\) and \(g\) are arrows
+\[%
+  f : W \to X, \quad g: W \to Y.
+\]%
+Then, since \(\brak{\_,\_}\) is an indexed function, it preserves the
+projection, so \(\brak{f,g}\) is an arrow \(W \to Z\). Since \(1_Z : Z \to Z\)
+is an element of \(\dset Z\), there exists a pair \(\pwrap{p_X,p_Y} \in \dset X
+\times \dset Y\) such that \(1_Z = \brak{p_X,p_Y}\). This means \(p_X\) and
+\(p_Y\) are arrows
+\[%
+  p_X : Z \to X, \quad p_Y : Z \to Y.
+\]%
+Since \(\brak{\_,\_}\) preserves multiplication, we obtain a commuting diagram
+\[%
+  \begin{tikzcd}
+    W \arrow[dr,"\exists ! \brak{f,g}", dashed] \arrow[drr, bend left=25,"f"]
+    \arrow[ddr, bend right=25, "g", swap] & & \\
+    & Z \arrow[d,"p_Y", swap] \arrow[r,"p_X"] & X \\
+    & Y. &
+  \end{tikzcd}
+\]%
+This is the usual categorical description of the product. We see from the
+definition that a product is unique up to indexed bijection. By the Yoneda lemma
+for indexed sets (Lemma~\ref{lemma:yoneda-indexed-sets}), this means that
+products are unique up to isomorphism in \(C\). Like for conjunctions in a
+preorder, we usually sweep this iunder the rug and refer to the whole
+isomorphism class of products by \(X \times Y\).
+\begin{definition}
+  Given a pair of arrows \(f,g: X \to Y\) in \(C\), an \textbf{equalizer} of
+  \(f\) and \(g\) is an object \(Z\) and an indexed bijection
+  \[%
+    \dset Z \cong E(\dset f, \dset g).
+  \]%
+\end{definition}
+Since \(1_Z\) is an element of \(\dset Z\), the above bijection provides an
+element \(e \in E(\dset f, \dset g\) such that \(\pi(e) = Z\). This means
+\(e\) is an arrow \(Z \to X\) such that \(f \circ e = g \circ e\).
+\begin{warning_box*}
+  \begin{exercise}
+    Using the indexed bijection, show that the above definition of equalizer is
+    equivalent to the following characterization. \(Z\) is an equalizer of \(f\)
+    and \(g\) if and only if, for any arrow \(h : V \to X\) such that \(f \circ h
+    = g \circ h\), there exists a unique arrow \(\widetilde{h} : E \to Z\) such
+    that \(h = e \circ \widetilde{h}\). Another way to state this property is the
+    following diagram.
+    \[%
+      \begin{tikzcd}
+        Z \arrow[r,"e"] & X \arrow[r,"f",shift left=1] \arrow[r,"g", shift
+        right=1, swap] & Y \\
+        V \arrow[ur,"h", swap] \arrow[u, dashed, "\exists ! \widetilde{h}"]
+        & & 
+      \end{tikzcd}
+    \]%
+    \nosectionrule
+  \end{exercise}
+\end{warning_box*}
+Having products and equalizers, there is one more type of limit to consider:
+\emph{terminal objects}. There is such thing as a terminal indexed set. Let
+\(1\) denote the indexed set defined by
+\[%
+  \abs{1} \eqdef C^{(0)}.
+\]%
+The projection is the identity, and multiplication is given by
+\[%
+  X \cdot f \eqdef V,
+\]%
+where \(f\) is an arrow \(V \to X\).
+\begin{proposition}
+  For any indexed set \(A\), there is exactly one indexed function \(!_A : A \to
+  1\).
+\end{proposition}
+\begin{proof}
+  Indexed functions must preserve projection. Since the projection on \(1\) is
+  the identity, this forces
+  \[%
+    !_A(a) \eqdef \pi(a).
+  \]%
+\end{proof}
+\begin{definition}
+  An object \(Z\) of \(C\) is a \textbf{terminal object} if there exists an
+  indexed bijection
+  \[%
+    \dset Z \cong 1.
+  \]%
+\end{definition}
+\begin{warning_box*}
+  \begin{exercise}
+    From the indexed bijection, show that an object \(Z\) is terminal if and
+    only if there exists exactly one arrow \(V \to Z\), for any object \(V \in
+    C^{(0)}\).
+  \end{exercise}
+\end{warning_box*}
+We now have the tools needed to define arbitrary limits.
+
 \section{Presheaves: Indexed sets as functors}
 
 \ifSubfilesClassLoaded{%

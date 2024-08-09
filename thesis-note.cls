@@ -88,7 +88,7 @@
 \RequirePackage[shortcuts]{extdash}
 \RequirePackage{setspace}
 \RequirePackage{xcolor}
-\RequirePackage{tcolorbox}
+\RequirePackage[many]{tcolorbox}
 % Add this package to count the number of exercises in the document.
 \RequirePackage{totcount}
 \RequirePackage{tocloft}
