@@ -304,7 +304,7 @@
 \newcommand*\@tnTitleUnderline[1]{%
   \bgroup
   \setbox\@tnTitleUnderlineBox\hbox{\colorbox{\@titlecolor}\strut}%
-  \setul{\dimexpr\dp\@tnTitleUnderlineBox-.3ex\relax}{.3ex}%
+  \setul{\dimexpr\dp\@tnTitleUnderlineBox-.15ex\relax}{.15ex}%
   \ul{\mbox{#1}}%
   \egroup%
 }%
@@ -312,7 +312,7 @@
 \newcommand*\@tnSectionNumberBox[1]{%
   \colorbox{\@titlecolor}
   {%
-    \makebox[2.5em][c]{%
+    \makebox[1.5em][c]{%
       \color{white}%
       \strut%
       \csname the#1\endcsname
@@ -323,7 +323,7 @@
 \newcommand*\@tnBareNumberBox[1]{%
   \colorbox{\@titlecolor}
   {%
-    \makebox[2.5em][c]{%
+    \makebox[1.5em][c]{%
       \color{white}%
       \strut%
       \csname the#1\endcsname
@@ -335,12 +335,12 @@
 \if\@hmonlymacros\@false
   \if\@hmtypewriter\@false
     \titleformat{\section}%
-    {\Large\bfseries\sffamily\color{\@titlecolor}}%
+    {\large\bfseries\sffamily\color{\@titlecolor}}%
     {\@tnSectionNumberBox{section}}%
     {0pt}%
     {\@tnTitleUnderline{#1}}%
     \titleformat{\subsection}%
-    {\large\bfseries\sffamily\color{\@titlecolor}}%
+    {\normalsize\bfseries\sffamily\color{\@titlecolor}}%
     {\@tnBareNumberBox{subsection}}
     {0pt}
     {{#1}}
@@ -455,12 +455,12 @@
 \providecommand{\makehmtitle}{{%
   \thispagestyle{plain} % surpress header on first page
   \color{\@titlecolor}%
-  {\noindent{\smallslbf{\@title}}}
+  {\noindent{\tenslbf{\@title}}}
   \quad
   {\smallslbf{\@subtitle}}
   \hfill{\color{darkgray}\large\textit\@author}
   \smallskip
-  \hrule
+  \linebreak%\hrule
   \smallskip
   {%
 	  {\color{darkgray}\noindent\textit{\@date}\hfill\textit{\@contact}}
@@ -492,13 +492,13 @@
 % Maintain compatibility with typewriter-math
 \newcommand\makehomeworktitle{%
 	\thispagestyle{empty}%
-	\begin{center}%
-		{\LARGE\@title}%
-		\ifx\@subtitle\empty\else\\{\LARGE\@subtitle}\fi
-		\ifx\@author\empty\else\\{\large\@author}\fi
-		\ifx\@contact\empty\else\\{\large\@contact}\fi
-		\ifx\@date\empty\else\\{\large\@date}\fi
-	\end{center}%
+        {\noindent\tenslbf\@title}%
+        \ifx\@subtitle\empty\else\\{\smallslbf\@subtitle}\fi
+        \smallskip
+        \ifx\@author\empty\else\\{\color{darkgray}\@author}\fi
+        \ifx\@contact\empty\else\\{\color{darkgray}\@contact}\fi
+        \smallskip
+        \ifx\@date\empty\else\\{\color{gray}\tinyslbf\@date}\fi
 }%
 
 \if\@hmonlymacros\@false

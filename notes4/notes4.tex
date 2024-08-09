@@ -2,9 +2,17 @@
 
 \begin{document}
 
-\title{Presheaves and Indexed Set Theory}
-\author{NeuPPL Category Seminar}
-\date{Summer 2024}
+\ifSubfilesClassLoaded{%
+    \title{Presheaves and Indexed Set Theory}
+    \subtitle{}
+    \author{}
+    \contact{Summer 2024}
+    \date{NeuPPL Category Seminar}}{%
+    \title{Presheaves and Indexed Set Theory}
+    \subtitle{}
+    \author{}
+    \contact{}
+    \date{}}
 
 \makehmtitle%
 
@@ -144,7 +152,7 @@ to make the set \(X\) compatible with the arrows of \(C\).
   Anticipating an equivalence between \(C\)\-/indexed sets and presheaves on
   \(C\), we could write \(\restr{x}{f}\) in lieu of \(\mu(x,f)\).
 \end{definition}
-Calling this a \(C\)\-/indexed set is admiteddly uncommon. Another name for a
+Calling this a \(C\)\-/indexed set is admitedly uncommon. Another name for a
 \(C\)\-/indexed set is a \emph{discrete opfibration}. This is more precise, and
 it alludes to a more general notion, called a \emph{fibration of categories}. On
 the other hand, there is a hint of the notion of \texttt{Writer m} algebra in a
@@ -267,7 +275,7 @@ we need to make a notion of \(C\)\-/indexed function.
   \]%
   \(C\)\-/indexed functions may be composed, by composing the underlying
   functions between sets. Furthermore, there is an obvious identity
-  function. This gives a category of \(C\)\-/indexed sets, which we call
+  function. This gives a (large) category of \(C\)\-/indexed sets, which we call
   \(\iSet{C}\).
 \end{definition}
 Given an arrow \(f: X \to Y\) in \(C\), we obtain an indexed function \(f_* :
@@ -287,12 +295,12 @@ Given an arrow \(f: X \to Y\) in \(C\), we obtain an indexed function \(f_* :
   \]%
 \end{lemma}
 \begin{proof}
-  We use the only trick in category theory: chase \texttt{refl}.  We first argue
-  that \(\dset\) is a functor. Since \(f_*\) is defined by composition in \(C\),
-  this is straightforward. We now show that \(\dset\) is faithful.  Let
-  \(f, g : X \to Y\) be two arrows in \(C\). Suppose \(f_* = g_*\). We need to
-  prove \(f = g\). The identity arrow \(1_X : X \to X\) is an element of
-  \(\dset X\). Then
+  We use the only trick in elementary category theory: chase \texttt{refl}.  We
+  first argue that \(\dset\) is a functor. Since \(f_*\) is defined by
+  composition in \(C\), this is straightforward. We now show that \(\dset\) is
+  faithful.  Let \(f, g : X \to Y\) be two arrows in \(C\). Suppose
+  \(f_* = g_*\). We need to prove \(f = g\). The identity arrow
+  \(1_X : X \to X\) is an element of \(\dset X\). Then
   \[%
     f = f_*(1_X) = g_*(1_X) = g,
   \]%
@@ -334,18 +342,314 @@ Given an arrow \(f: X \to Y\) in \(C\), we obtain an indexed function \(f_* :
   Therefore \(a(\phi(a_0)) = a_0\). This shows that \(a(\_)\) and \(\phi(\_)\)
   are inverses, proving the desired bijection.
 \end{proof}
-We have shown that \(\dset\) is an embedding. When we did this for preorders, we
-used this embedding to lift operations on truth\-/values to universal
-constructions on a preorder. We do the analogous thing for indexed sets, lifting
-operations on sets to universal constructions on a category.
+We have shown that \(\dset\) is an embedding.
 
 \subsection*{Indexed set theory}
 
-Test
+When we developed the \(\dset\) embedding for preorders, we used it to lift
+operations on truth\-/values to universal constructions on a preorder. We do the
+analogous thing for indexed sets, lifting operations on sets to universal
+constructions on a category.  Fornotational simplicity, we will use \(\pi\) and
+\(\_\cdot\_\) to refer to the projection and multiplication of any
+\(C\)\-/indexed set. Given a \(C\)\-/indexed set \(X\), we will write
+\(\abs{X}\) for its underlying set, so \(\pi\) is a function
+\(\abs{X} \to C^{(0)}\). Finally, we will assume all indexed sets are indexed
+over a fixed category \(C\), so we will just call them \emph{indexed sets}
+rather than \(C\)\-/indexed sets.
 
+\begin{definition}
+  Let \(X\) and \(Y\) be a pair of of indexed sets. The \textbf{product indexed
+    set} \(X \times Y\) is defined in the following manner. Its underlying set
+  is the restriction
+  \[%
+    \abs{X \times Y} \eqdef \bwrap{ \pwrap{x,y} \in \abs{X} \times \abs{Y} \mid
+      \pi(x) = \pi(y) }.
+  \]%
+  The projection \(\pi : \abs{X \times Y} \to C^{(0)}\) is derived from the
+  projections for \(X\) and \(Y\) (the restriction above ensures this is
+  well\-/defined). The multiplication is defined ``pointwise'':
+  \[%
+    \pwrap{x,y} \cdot f \eqdef \pwrap{x \cdot f, y \cdot f}.
+  \]%
+\end{definition}
+We can write a similar definition for products of arbitraily\-/many indexed
+sets.
+\begin{definition}
+  Let \(X\) and \(Y\) be a pair of indexed sets. The \textbf{disjoint union
+    indexed set} \(X \amalg Y\) has underlying set \(\abs{X} \amalg
+  \abs{Y}\). The projection \(\pi : \abs{X \amalg Y} \to C^{(0)}\) is the sum
+  \(\pi_X \amalg \pi_Y\), same for the multiplication, e.g.,
+  \[%
+    \texttt{Left} \, x \cdot f \eqdef \texttt{Left} \, \pwrap{x \cdot f}.
+  \]%
+\end{definition}
+As before, we can define arbitrarily\-/large indexed disjoint unions. Refinement
+types, i.e., equalizers or pullbacks, look much like products.
+\begin{definition}
+  Given two indexed functions \(f,g : X \to Y\), the \textbf{equalizer} of \(f\)
+  and \(g\) is the indexed set \(E(f,g)\) defined in the following manner. The
+  underlying set is the restriction
+  \[%
+    \abs{E(f,g)} \eqdef \bwrap{ x \in X \mid f(x) = g(x) }.
+  \]%
+  The projection and multiplication for \(E(f,g)\) is derived from \(X\). This
+  is well\-/defined because \(f\) and \(g\) are indexed functions, so they
+  commute with projection and multiplication.
+\end{definition}
+For many constructions, the indexed operations look like the usual
+set\-/theoretic ones, this is mostly the case (and it is due to the fact that
+limits and colimits of presheaves are computed pointwise; more on that
+later). We now discuss indexed subsets.
+\begin{definition}
+  Given an indexed set \(X\), a subset \(\abs{A} \subseteq \abs{X}\) is a
+  \textbf{indexed subset} if it is closed under multiplication. In this case,
+  \(\abs{A}\) defines an indexed set \(A\), and the inclusion map \(\abs{A}
+  \hookrightarrow \abs{X}\) is an indexed function.
+\end{definition}
+\begin{definition}
+  Given a pair of indexed subsets \(A,B \subseteq X\). Their
+  \textbf{intersection} is indexed
+  \[%
+    \abs{A \cap B} \eqdef \abs{A} \cap \abs{B}.
+  \]%
+  Similarly, their \textbf{union} is indexed
+  \[%
+    \abs{A \cup B} \eqdef \abs{A} \cup \abs{B}.
+  \]%
+\end{definition}
+Since the empty set is vacuously an indexed set, the above definitions give the
+structure of a (bounded) distributive lattice on the the set \(\Sub{X}\) of
+indexed subsets of an indexed set \(X\). This lattice is actually a Heyting
+algebra, but the Heyting implication \(\Rightarrow\) is subtle. The above
+pattern suggests we might try
+\(\abs{A \Rightarrow B} \stackrel{?}{=} \abs{A} \Rightarrow \abs{B}\).  The
+issue is the right side is not closed under multiplication. Here is an example.
+\begin{warning_box*}
+  \begin{example}
+    Let \(C = \Cl\pwrap{\N,\leq}\). Here is a picture of \(C\).
+    \[%
+      \begin{tikzcd}
+        0 \arrow[r,"\partial_0"] & 1 \arrow[r,"\partial_1"] & 2
+        \arrow[r,"\partial_2"] & \ldots
+      \end{tikzcd}
+    \]%
+    Here I have named the arrows in \(C\) \(\partial_n : n \to n + 1\)
+    (technically, an arbitrary arrow of \(C\) is a composition
+    \(\partial_{n-k} \circ \ldots \circ \partial_n : n-k \to n+1\), but this is
+    not important for the example). This will make it easier to describe the
+    multiplication on \(C\)\-/indexed sets. Speaking intuitively (and loosely),
+    a \(C\)\-/indexed set \(X\) is a set which changes over time. The projection
+    \(\pi: \abs{X} \to \N\) sends an element \(x \in \abs{X}\) to the stage
+    \(n \in \N\) when \(x\) appears. Multiplication by \(\partial_n\) is a map
+    \(\_ \cdot \partial_n : \abs{X} \to \abs{X}\) which evolves an element one
+    step forward in time. The direction of this evolution is reverse to the
+    direction the arrows point in \(C\), so we should understand that looking at
+    larger values of \(n \in \N\) amounts to peering further back in time.
+
+    One example of a \(C\)\-/indexed set is a ``descending'' copy of the natural
+    numbers \(\widetilde{\N}\):
+    \[%
+      \abs{\widetilde{\N}} \eqdef C^{(0)} \times \N.
+    \]%
+    The projection \(\pi: \abs{\widetilde{\N}} \to C^{(0)}\) is defined to be
+    projection onto the first component. The multiplication shifts the second
+    component downward, if possible:
+    \[%
+      \pwrap{i+1,n} \cdot \partial_i \eqdef%
+      \begin{cases}
+        \pwrap{i,n-1} & n \geq 1\\
+        \pwrap{i,0} & n = 0
+      \end{cases}.
+    \]%
+    Given a natural number \(a \in \N\), we can form a \(C\)\-/indexed subset of
+    \(\widetilde{\N}\):
+    \[%
+      S_a \eqdef \bwrap{ \pwrap{i,n} \in \abs{\widetilde{\N}} \mid n < a }.
+    \]%
+    Since the multiplication on \(\widetilde{\N}\) shifts elements downward,
+    \(S_a\) is closed under multiplication, so it is in fact an indexed
+    subset. The empty set \(\emptyset = S_{0}\) is also an indexed subset. We now
+    look at the ordinary \(\Set\)\-/based Heyting implication
+    \[%
+      \abs{S_a} \Rightarrow \emptyset.
+    \]%
+    This is the complement of \(S_a\), i.e.,
+    \[%
+      \abs{S_a} \Rightarrow \emptyset = \bwrap{ x \in \abs{\widetilde{\N}} \mid x
+        \geq a}.
+    \]%
+    This is not closed under multiplication. For example, \(\pwrap{i+1,a}\) is in
+    \(\abs{S_a} \Rightarrow \emptyset\), but \(\pwrap{i+1,a} \cdot \partial_i\) is
+    not. Thus, \(\abs{S_a} \Rightarrow \emptyset\) is not an indexed subset, so
+    the \(\Set\)\-/based Heyting implication is not the correct choice for a
+    Heyting implication on indexed subsets!
+  \end{example}
+\end{warning_box*}
+The above example shows that, in order to define \(\Rightarrow\) among indexed
+subsets, we need to force \(\abs{A \Rightarrow B}\) to be closed under
+multiplication. The solution? \emph{force} it to be closed under multiplication.
+\begin{definition}
+  Let \(A,B \subseteq X\) be indexed subsets. The \textbf{Heyting implication}
+  of \(A \Rightarrow B\) has underlying subset
+  \[%
+    \abs{A \Rightarrow B} \eqdef \bwrap{ x \in X \mid \forall f \in C^{(1)}. \,
+      x \cdot f \in \abs{A} \Rightarrow x \cdot f \in \abs{B} }.
+  \]%
+\end{definition}
+\begin{proposition}
+  As defined above, the Heyting implication \(A \Rightarrow B\) of two indexed
+  subsets is closed under multiplication, so it is an indexed subset.
+\end{proposition}
+\begin{proof}
+  Let \(a\) be an element in \(\abs{A \Rightarrow B}\), and let \(f : x \to
+  \pi(a)\) be an arrow in \(C\). We need to show that \(a \cdot f\) is in
+  \(\abs{A \Rightarrow B}\). To that end, let \(g : y \to x\) be an arrow (note
+  \(\pi(a \cdot f) = x\), so any arrow \(g\) for which the multiplication
+  \(\pwrap{a \cdot f} \cdot g\) is defined has this shape). We need to show
+  that, if \(\pwrap{a \cdot f} \cdot g\) is in \(\abs{A}\), then it is also in
+  \(\abs{B}\). Note, \(\pwrap{a \cdot f} \cdot g = a \cdot \pwrap{f \circ
+    g}\). Therefore, if \(\pwrap{a \cdot f} \cdot g\) is in \(\abs{A}\), then
+  \(a \cdot \pwrap{f \circ g} \in \abs{A}\). Since \(a \in \abs{A \Rightarrow
+    B}\), this implies \(a \cdot \pwrap{f \circ g} \in \abs{B}\), i.e.,
+  \(\pwrap{a \cdot f} \cdot g \in \abs{B}\). Since \(g\) is arbitrary, this
+  shows that \(a \cdot f \in \abs{A \Rightarrow B}\), as desired.
+\end{proof}
+To show that \(A \Rightarrow B\) is rightfully the Heyting implication, we
+should show that it satisfies the same universal property.
+\begin{proposition}
+  Let \(U, V,\) and \(W\) be a triplet of indexed subsets of \(X\). Then
+  \[%
+    U \cap V \subseteq W \text{ if and only if } U \subseteq V \Rightarrow W.
+  \]%
+\end{proposition}
+\begin{proof}
+  Assume \(U \cap V \subseteq W\). Let \(u \in \abs{U}\). We need to show that
+  \(u \in \abs{V \Rightarrow W}\). To that end, let \(f: x \to \pi(u)\) be an
+  arrow of \(C\) for which \(u \cdot f\) is defined. Suppose
+  \(u \cdot f \in \abs{V}\). Since \(u \in \abs{U}\), and \(\abs{U}\) is closed
+  under multiplication, \(u \cdot f \in \abs{U \cap V}\). This is a subset of
+  \(W\), so \(u \cdot f \in \abs{W}\). Since \(f\) is arbitrary, this shows \(u
+  \in \abs{V \Rightarrow W}\), so \(U \subseteq V \Rightarrow W\). Conversely,
+  assume \(U \subseteq V \Rightarrow W\), and let \(u\) be an element of
+  \(\abs{U \cap V}\). We need to show that \(u \in \abs{W}\). Consider the arrow
+  \(1_{\pi(u)} : \pi(u) \to \pi(u)\). Since \(U \subseteq V \Rightarrow W\), \(u
+  \in \abs{V \Rightarrow W}\). We now observe two things:
+  \begin{enumerate}
+  \item \(u = u \cdot 1_{\pi(u)}\), so \(u \cdot 1_{\pi(u)} \in \abs{V}\).
+  \item \(u \cdot 1_{\pi(u)} \in \abs{V}\) implies \(u \cdot 1_{\pi(u)} \in
+    \abs{W}\), so \(u \in \abs{W}\).
+  \end{enumerate}
+  Since \(u\) is arbitrary, this shows \(U \cap V \subseteq W\), as desired.
+\end{proof}
+\begin{corollary}
+  Given an indexed set \(X\), the set of indexed subsets \(\Sub{X}\) (or, less
+  ambiguously, \(\Sub_C{X}\)) is a Heyting algebra.
+\end{corollary}
+The above corollary allows us to interpret propositional logic inside the
+category of \(C\)\-/indexed sets and indexed functions. This is done by fixing
+an indexed set and interpreting propositions as indexed subsets. Using the
+quantifiers as adjoints perspective, we will lift this to an interpretation of
+first\-/order logic inside \(C\)\-/indexed sets. Indeed, the category of
+\(C\)\-/indexed sets is a \emph{topos}, so we can actually interpret
+higher\-/order logic by extending the above theory. To that end, we end this
+section by describing exponentials and quotients of indexed sets.
+\begin{definition}
+  Let \(X\) and \(Y\) be two indexed sets. The \textbf{exponential} indexed set
+  \(Y^X\) is defined in the following manner. The elements of \(\abs{Y^X}\) are
+  pairs \(\pwrap{v,\phi}\) consisting of an object \(v \in C^{(0)}\) and a
+  \(C\)\-/indexed function \(\phi : \dset v \times X \to Y\). The projection \(\pi
+  : \abs{Y^X} \to C^{(0)}\) sends a pair \(\pwrap{v,\phi}\) to \(v\).
+
+  The multiplication is defined by the following operation. Given
+  \(\pwrap{v,\phi} \in \abs{Y^X}\) and \(f: u \to v\), let \(\phi \ast f\) be the
+  indexed function \(\dset y \times X \to Y\)
+  \[%
+    \pwrap{\phi \ast f}(w \xrightarrow{g} u, x) \eqdef \phi(f \circ g, x). 
+  \]%
+  We define the multiplication on \(Y^X\) to be
+  \[%
+    \pwrap{v,\phi} \cdot f \eqdef \pwrap{u,\phi \ast f}.
+  \]%
+\end{definition}
+Like the Heyting implication, we should show that the exponential satisfies the
+usual Currying properties we expect from the exponential in the category
+\(\Set\).
+\begin{proposition}
+  Let \(X,Y,\) and \(Z\) be a triplet of indexed sets. There is a bijective
+  correspondence between indexed functions
+  \[%
+    \iSet{C}\pwrap{X \times Y, Z} \cong \iSet{C}\pwrap{X,Z^Y}.
+  \]%
+\end{proposition}
+\begin{proof}
+  Let \(\phi: X \times Y \to Z\) be an indexed function. We define the indexed
+  function \(\phi^\dagger : X \to Z^Y\) in the following manner. Given an
+  element \(x \in \abs{X}\),
+  \[%
+    \phi^\dagger(x) \eqdef \pwrap{\pi(x), \pwrap{f,y} \mapsto \phi(x \cdot
+      f,y)},
+  \]%
+  where \(f\) is an element of \(\dset \pi(x)\). To show that this is
+  well\-/defined, we need to show that \(\pwrap{f,y} \mapsto \phi(x\cdot f, y)\)
+  defines an indexed function \(\dset \pi(x) \times Y \to Z\). An element
+  \(\pwrap{f,y} \in \dset \pi(x) \times Y\) satisfies \(\pi(f) =
+  \pi(y)\). Therefore \(f\) is an arrow of the form \(f : \pi(y) \to \pi(x)\),
+  therefore the pair \(\pwrap{x \cdot f, y}\) is in \(X \times Y\), so \(\phi(x
+  \cdot f, y)\) is well\-/defined. Since \(\phi\) is an indexed function,
+  \(\pwrap{f,y} \mapsto \phi(x\cdot f,y)\) commutes with projection and
+  multiplication.
+
+  Having shown \(\phi \mapsto \phi^\dagger\) is a well\-/defined function from
+  \(\iSet{C}\pwrap{X \times Y, Z}\) to \(\iSet{C}\pwrap{X,Z^Y}\), we need to
+  find an inverse. Let \(\psi : X \to Z^Y\) be an indexed function. Given a pair
+  \(\pwrap{x,y} \in \abs{X \times Y}\), \(\psi(x)\) is a pair
+  \(\pwrap{v_x,\theta_x}\), where \(\theta_x\) is an indexed function
+  \(\dset v \times Y \to Z\). Since \(\psi\) is an indexed function,
+  \(\pi(v_x,\theta_x) = \pi(x)\), so \(v_x = \pi(x)\). Furthermore
+  \(\pwrap{x,y}\) is assumed to be in \(\abs{X \times Y}\), so
+  \(\pi(x) = \pi(y)\). We define \(\psi^\dagger : X \times Y \to Z\) to be the
+  function
+  \[%
+    \psi^\dagger\pwrap{x,y} \eqdef \theta_x\pwrap{1_{\pi(y)},y}.
+  \]%
+  Since \(v_x = \pi(y)\), this is well\-/defined. Before moving forward, we make
+  an observation about \(\theta_x\). Since \(\psi\) is an indexed function, for
+  any \(x \in X\) and any \(f: u \to \pi(x)\), \(\psi(x \cdot f) = \psi(x) \cdot
+  f\). Expanding this in terms of \(\theta_x\) and \(\theta_{x \cdot f}\) gives
+  \[%
+    \theta_{x \cdot f} = \theta_x \ast f.
+  \]%
+  We now need to argue that \(\phi \mapsto \phi^\dagger\) and
+  \(\psi \mapsto \psi^\dagger\) are inverses, i.e.,
+  \(\phi = \phi^{\dagger\dagger}\) and \(\psi = \psi^{\dagger\dagger}\). Given a
+  pair \(\pwrap{x,y} \in \abs{X \times Y}\), we have
+  \(\phi^{\dagger\dagger}\pwrap{x,y} = \phi\pwrap{x \cdot 1_{\pi(x)}, y} =
+  \phi(x,y)\). Therefore \(\phi^{\dagger\dagger} = \phi\). Finally, given \(x
+  \in \abs{X}\),
+  \begin{align*}%
+    \psi^{\dagger\dagger}(x) &= \pwrap{\pi(x), \pwrap{f,y} \mapsto
+      \psi^\dagger(x \cdot f, y)} \\
+    &= \pwrap{\pi(x), \pwrap{f,y} \mapsto \theta_{x \cdot f}(1_{\pi(y)}, y)}\\
+    &= \pwrap{\pi(x), \pwrap{f,y} \mapsto \theta_x \ast f \pwrap{1_{\pi(y)},
+        y}}\\
+    &= \pwrap{\pi(x), \pwrap{f,y} \mapsto \theta_x\pwrap{f,y}}\\
+    &= \pwrap{\pi(x),\theta_x}\\
+    &= \psi(x).
+  \end{align*}%
+  The last line in this chain of equalities is \(\eta\)\-/reduction. This shows
+  \(\psi^{\dagger\dagger} = \psi\), proving the desired bijection.
+\end{proof}
+Thankfully quotients are simpler.
+\begin{definition}
+  Let \(X\) be an indexed set, and let \(R\) be an indexed subset of \(X \times
+  X\) such that \(\abs{R}\) defines an equivalence relation on \(\abs{X}\). The
+  \textbf{quotient} indexed set \(X/R\) has underlying set \(\abs{X} /
+  \abs{R}\). The projection and multiplication is inherited from \(X\).
+\end{definition}
 \section{Presheaves: Indexed sets as functors}
 
 \ifSubfilesClassLoaded{%
+    \newpage
     \bibliographystyle{apalike}%
     \bibliography{../refs}}%
 
